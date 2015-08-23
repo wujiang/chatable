@@ -1,0 +1,104 @@
+ASAPP Full Stack Systems Architecture Challenge
+===============================================
+
+Welcome to your challenge project!
+
+You have two timeline options. If you live outside of NY and would have to fly in for your onsite, we strongly prefer that you take option 1. If coming in to the office is easy for you, then whichever you prefer is great.
+
+Option 1: Code at home, half-day at ASAPP
+    - Finish your implementation and write up answers to the follow-up questions at home on your own time.
+    - Send us your results within 5 days. If you need more time, please let us know.
+    - We estimate that the challenge should take somewhere between 1.5 and 10 hours depending on your experience and speed.
+
+Option 2: Answer questions at home, full-day at ASAPP
+    - Think through the challenge at home, make a rough plan of your approach, and write up answers to all the follow-up questions.
+    - Send us your results within 3 days. If you need more time, please let us know.
+    - We estimate this should take somewhere between 0.5 and 3 hours depending on your experience and speed.
+
+
+Motivation
+----------
+
+ASAPP's server infrastructure delivers realtime communication and must scale to support companies with hundreds of millions of customers. Scaling realtime communication across multiple servers and persisting their conversation logs involves a number of interesting engineering challenges. In order to tackle these challenges we rely on our engineering team members' ability to reason about and design such systems, both conceptually and concretely, from a bird's eye perspective as well as in great detail.
+
+Your challenge is to design and implement a basic realtime chat service, and then discuss the challenges that would be involved in scaling it up.
+
+Conceptually, the service should have five high-level abilities: Connect, Authenticate, Send Message, Receive Message (push), and Fetch History.
+
+If we mutually agree to proceed then your work will form the basis for continued discussions and interviews.
+
+
+Misc thoughts and recommendations before we go into details
+-----------------------------------------------------------
+
+- Use the programming languages and tools that you're most familiar with. At ASAPP you would be using alot of Go.
+- We rely on tests to move fast and break nothing. I recommend that you do as well.
+- Version control. It's a plus if your results come with a commit history.
+- We recommend using open source libraries rather than reinventing the wheel. Here is a very small selection of repos we use:
+    github.com/gorilla/websocket, github.com/go-sql-driver/mysql, github.com/garyburd/redigo, code.google.com/p/go.crypto/bcrypt
+- Avoid any hosted services that aren't open source. You can't reason about their behavior, and we're looking for your ability to reason about the behavior of your designs.
+- Have fun! If you don't think this project sounds like fun, then working at ASAPP may not be your cup of tea :)
+
+
+Server requirements
+-------------------
+
+- Connect to server
+
+    The server should accept HTTP requests and upgrade them to websocket connections.
+
+- "Login" with username
+
+    A connected client should be able to authenticate with a given username.
+    Don't worry about passwords at this point.
+
+- Send Message to another username
+
+    An authenticated connection should be able to send a text message to a given username.
+    Messages should be persisted to a database.
+
+- Receive Messages in realtime
+
+    An authenticated connection should receive messages sent to its authenticated username.
+    (What happens if multiple connections are authenticated with the same username?)
+
+- Fetch Message History
+
+    Mobile apps go offline and online all the time.
+    Upon reconnecting, a device should be able to fetch all the messages that it has missed.
+
+
+Follow-up questions
+-------------------
+
+Please take the time to write answers to these questions. Think through them as deeply and thoroughly as you can. Keep answers short and comprehensive if possible.
+
+Our goal is to get a sense of how comprehensively you understand server systems like ours, and how effectively you can communicate about them. We're looking for deep understanding of the problems involved even if you don't have all the answers:
+
+- How will you scale your server beyond a single machine?
+    Keep in mind that all messages need to be delivered in realtime, and that communicating users may be connected to different machines.
+    Also consider that a user may have multiple devices that could be connected to different machines.
+
+- How will you support a typical "home" screen which lists all conversations along with their most recent message?
+    All conversations need to be up to date at all times.
+    Consider the case where a device is offline for a day and comes back online.
+    Also consider the possibility of a user having multiple devices.
+    What if a user has had a total of ~1'000 conversations and goes online/offline frequently?
+
+On-site discussion questions
+----------------------------
+
+You don't have to answer these questions now, but you'll be expected to address them thoroughly in interview discussions once on-site:
+
+- How will you deploy new versions of your code without any downtime?
+    Taking a box or process offline that still has open websocket connections is probably a Bad Idea (tm).
+
+- How will you implement picture messages?
+    Where is image data stored? How/when are thumbs generated? How are URLs decided on?
+
+- Imagine that Comcast will start directing their customer support traffic at your system a month from now. How do you prepare?
+    They see roughly 1M conversations per day
+
+- How will your system handle a user with multiple devices gracefully?
+    E.g imagine a user alternating between her laptop, her phone and her tablet.
+    Also imagine a user who has used the service for 3 years and then adds a new device.
