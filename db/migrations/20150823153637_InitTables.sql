@@ -20,7 +20,7 @@ create table users (
 );
 
 
-create table inboxes (
+create table threads (
        id serial,
        user_id int references users(id) not null,
        with_user_id int references users(id) not null,
@@ -64,5 +64,5 @@ create index idx_connections_user_id on connections (user_id);
 -- SQL section 'Down' is executed when this migration is rolled back
 drop table envelopes;
 drop table connections;
-drop table inboxes;
+drop table threads;
 drop table users;
