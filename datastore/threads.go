@@ -13,7 +13,7 @@ func init() {
 	tm.SetKeys(true, "id")
 	tm.ColMap("UserID").SetNotNull(true)
 	tm.ColMap("WithUserID").SetNotNull(true)
-	tm.SetUniqueTogether("UserID", "WithUserID")
+	tm.SetUniqueTogether("user_id", "with_user_id")
 }
 
 // Implement the ThreadService
