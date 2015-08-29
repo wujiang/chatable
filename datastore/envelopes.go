@@ -24,7 +24,8 @@ func (es *envelopeStore) GetByUserIDWithUserID(uid int, withuid int,
 	offset int) ([]*asapp.Envelope, error) {
 	var env asapp.Envelope
 	query := `
-                select *
+                select id, user_id, with_user_id, is_incoming, created_at,
+                        deleted_at, read_at, message, message_type
                 from envelopes
                 where user_id = $1 and with_user_id = $2 and deleted_at is null
                 order by created_at desc
@@ -42,14 +43,25 @@ func (es *envelopeStore) GetByUserIDWithUserID(uid int, withuid int,
 	return envelopes, err
 }
 
+// Create adds a new row in envelopes
+func (es *envelopeStore) Create(env *asapp.Envelope) error {
+	return es.dbh.Insert(env)
+}
+
 // MarkDelete marks an envelop as deleted
 func (es *envelopeStore) MarkDelete(env *asapp.Envelope) (int64, error) {
-	env.DeletedAt = time.Now().UTC()
+	env.DeletedAt = asapp.NullTime{
+		Time:  time.Now().UTC(),
+		Valid: true,
+	}
 	return es.dbh.Update(env)
 }
 
 // MarkRead marks an envelop as read
 func (es *envelopeStore) MarkRead(env *asapp.Envelope) (int64, error) {
-	env.ReadAt = time.Now().UTC()
+	env.ReadAt = asapp.NullTime{
+		Time:  time.Now().UTC(),
+		Valid: true,
+	}
 	return es.dbh.Update(env)
 }

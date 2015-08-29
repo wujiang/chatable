@@ -4,21 +4,24 @@ import "time"
 
 // Thread represents a row in the threads table
 type Thread struct {
-	ID            int       `db:"id"`
-	UserID        int       `db:"user_id"`
-	WithUserID    int       `db:"with_user_id"`
-	WithUsername  string    `db:"with_username"`
-	CreatedAt     time.Time `db:"created_at"`
-	LatestMessage string    `db:"latest_message"`
+	ID            int      `db:"id"`
+	UserID        int      `db:"user_id"`
+	WithUserID    int      `db:"with_user_id"`
+	WithUsername  string   `db:"with_username"`
+	CreatedAt     NullTime `db:"created_at"`
+	LatestMessage string   `db:"latest_message"`
 }
 
 // NewThread creates a new thread
 func NewThread(uid int, withuid int, withuname string, msg string) *Thread {
 	return &Thread{
-		UserID:        uid,
-		WithUserID:    withuid,
-		WithUsername:  withuname,
-		CreatedAt:     time.Now().UTC(),
+		UserID:       uid,
+		WithUserID:   withuid,
+		WithUsername: withuname,
+		CreatedAt: NullTime{
+			Time:  time.Now().UTC(),
+			Valid: true,
+		},
 		LatestMessage: msg,
 	}
 }
