@@ -1,10 +1,6 @@
 package datastore
 
-import (
-	"database/sql"
-
-	"gitlab.com/wujiang/asapp"
-)
+import "gitlab.com/wujiang/asapp"
 
 type threadStore struct{ *DataStore }
 
@@ -22,7 +18,8 @@ func init() {
 func (ts *threadStore) GetByUserID(uid int, offset int) ([]*asapp.Thread, error) {
 	var t asapp.Thread
 	query := `
-                select *
+                select id, user_id, with_user_id, with_username, created_at,
+                        latest_message
                 from threads
                 where user_id = $1
                 order by created_at desc
@@ -39,22 +36,24 @@ func (ts *threadStore) GetByUserID(uid int, offset int) ([]*asapp.Thread, error)
 	return threads, err
 }
 
-func (ts *threadStore) getByUserIDWithUserID(uid int, withuid int) (*asapp.Thread, error) {
-	var t asapp.Thread
-	err := ts.dbh.SelectOne(&t,
-		`select 1 from threads where user_id = $1 and with_user_id = $2`,
-		uid, withuid)
-	return &t, err
-}
-
-// Upsert updates or inserts a thread
+// Upsert upserts a row in threads based on (user_id, with_user_id).
+// updates doesn't return the rows affected.
 func (ts *threadStore) Upsert(t *asapp.Thread) (int64, error) {
-	_, err := ts.getByUserIDWithUserID(t.UserID, t.WithUserID)
-	if err == sql.ErrNoRows {
-		return 1, ts.dbh.Insert(t)
-	} else if err == nil {
-		return ts.dbh.Update(t)
-	} else {
-		return 0, err
+	query := `
+                with upsert as (
+                        update threads
+                        set created_at = $1, latest_message = $2
+                        where user_id = $3 and with_user_id = $4
+                        returning *)
+                insert into threads (user_id, with_user_id, with_username,
+                        created_at, latest_message)
+                        select $3, $4, $5, $1, $2
+                where not exists (select * from upsert)
+                `
+	result, err := ts.dbh.Exec(query, t.CreatedAt, t.LatestMessage,
+		t.UserID, t.WithUserID, t.WithUsername)
+	if err != nil {
+		return int64(0), err
 	}
+	return result.RowsAffected()
 }

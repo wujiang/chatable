@@ -31,7 +31,7 @@ create table threads (
        unique (user_id, with_user_id)
 );
 
-create index idx_inboxes_user_id_created_at on inboxes (user_id, created_at desc);
+create index idx_threads_user_id_created_at on threads (user_id, created_at desc);
 
 
 create table envelopes (
