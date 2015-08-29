@@ -20,7 +20,7 @@ create table users (
 );
 
 
-create table inboxes (
+create table threads (
        id serial,
        user_id int references users(id) not null,
        with_user_id int references users(id) not null,
@@ -31,7 +31,7 @@ create table inboxes (
        unique (user_id, with_user_id)
 );
 
-create index idx_inboxes_user_id_created_at on inboxes (user_id, created_at desc);
+create index idx_threads_user_id_created_at on threads (user_id, created_at desc);
 
 
 create table envelopes (
@@ -64,5 +64,5 @@ create index idx_connections_user_id on connections (user_id);
 -- SQL section 'Down' is executed when this migration is rolled back
 drop table envelopes;
 drop table connections;
-drop table inboxes;
+drop table threads;
 drop table users;
