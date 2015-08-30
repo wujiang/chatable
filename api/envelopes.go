@@ -28,7 +28,7 @@ func serveGetEnvelopes(w http.ResponseWriter, r *http.Request) asapp.CompoundErr
 		return asapp.NewServerError(err.Error())
 	}
 	var pubEnv []*asapp.PublicEnvelope
-	for env := range envelopes {
+	for _, env := range envelopes {
 		pubEnv = append(pubEnv, env.ToPublic())
 	}
 

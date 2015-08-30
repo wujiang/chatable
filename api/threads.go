@@ -20,7 +20,7 @@ func serveGetThreads(w http.ResponseWriter, r *http.Request) asapp.CompoundError
 		return asapp.NewServerError(err.Error())
 	}
 	var pubThreads []*asapp.PublicThread
-	for th := range threads {
+	for _, th := range threads {
 		pubThreads = append(pubThreads, th.ToPublic())
 	}
 	return writeJSON(w, asapp.NewJSONResult(pubThreads, page))

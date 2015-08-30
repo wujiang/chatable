@@ -1,7 +1,8 @@
 package router
 
 const (
-	CreateAuthToken     = "auth_token:put"
+	Register            = "register:post"
+	CreateAuthToken     = "auth_token:post"
 	DeactivateAuthToken = "auth_token:delete"
 	GetInbox            = "inbox:get"
 	GetThread           = "thread:get"

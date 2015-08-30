@@ -42,6 +42,15 @@ func NewUser(fname, lname, uname, pass, email, phone, ip string) *User {
 	}
 }
 
+type UserWithToken struct {
+	FirstName   string      `json:"first_name"`
+	LastName    string      `json:"last_name"`
+	Username    string      `json:"username"`
+	Email       string      `json:"email"`
+	PhoneNumber string      `json:"phone_number"`
+	Token       PublicToken `json:"token"`
+}
+
 // UserService defines the protocol for users
 type UserService interface {
 	GetByID(id int) (*User, error)

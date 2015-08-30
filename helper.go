@@ -64,14 +64,14 @@ func NewJSONResult(v interface{}, page int) *JSONResult {
 	}
 }
 
-func NewErrorJSONResult(err JSONError, page int) *JSONResult {
+func NewErrorJSONResult(err JSONError) *JSONResult {
 	return &JSONResult{
 		Status:      "fail",
 		Error:       err,
 		Data:        []struct{}{},
 		CurrentPage: 0,
 		PerPage:     PerPage,
-		Page:        page,
+		Page:        1,
 	}
 }
 

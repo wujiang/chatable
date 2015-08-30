@@ -10,8 +10,9 @@ import (
 var (
 	passwordMinLen = 10
 
-	emailRE = regexp.MustCompile("^[\\w!#$%&'*+\\-/=?^`{|}~.]+@(?:[a-z0-9][a-z0-9\\-]{0,62}\\.)+(?:[a-z]{2,63}|xn--[a-z0-9\\-]{2,59})$")
-	phoneRE = regexp.MustCompile("^[0-9]+$")
+	emailRE    = regexp.MustCompile("^[\\w!#$%&'*+\\-/=?^`{|}~.]+@(?:[a-z0-9][a-z0-9\\-]{0,62}\\.)+(?:[a-z]{2,63}|xn--[a-z0-9\\-]{2,59})$")
+	phoneRE    = regexp.MustCompile("^[0-9]+$")
+	usernameRE = regexp.MustCompile("^[a-zA-Z]\\w+$")
 
 	ErrEmailFormat   = errors.New("please enter a valid email address")
 	ErrPasswordLen   = errors.New(fmt.Sprintf("please enter a password with at least %d characters", passwordMinLen))
@@ -103,12 +104,26 @@ func NameValidator() ValidatorFunc {
 	return ValidatorFunc(func(value interface{}) error {
 		strValue, ok := value.(string)
 		if !ok {
-			return ErrPhoneFormat
+			return ErrNameFormat
 		}
 		strValue = strings.TrimSpace(strValue)
 		// if !nameRE.MatchString(strValue) {
 		// 	return ErrNameFormat
 		// }
+		return nil
+	})
+}
+
+func UsernameValidator() ValidatorFunc {
+	return ValidatorFunc(func(value interface{}) error {
+		strValue, ok := value.(string)
+		if !ok {
+			return ErrNameFormat
+		}
+		strValue = strings.TrimSpace(strValue)
+		if !usernameRE.MatchString(strValue) {
+			return ErrNameFormat
+		}
 		return nil
 	})
 }

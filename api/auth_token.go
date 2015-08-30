@@ -14,7 +14,7 @@ var (
 )
 
 func init() {
-	authTokenForm.WithField("email", new(forms.FieldBuilder).
+	authTokenForm.WithField("username", new(forms.FieldBuilder).
 		Required().
 		Loader(forms.StringLoader))
 	authTokenForm.WithField("password", new(forms.FieldBuilder).
@@ -46,7 +46,7 @@ func serveCreateAuthToken(w http.ResponseWriter, r *http.Request) asapp.Compound
 	if !valid {
 		return authTokenForm.ConsolidateErrors()
 	}
-	u, err := store.UserStore.GetByEmail(authTokenForm.Values["email"].(string))
+	u, err := store.UserStore.GetByUsername(authTokenForm.Values["username"].(string))
 	if err != nil {
 		return auth.ErrUnauthenticated
 	}
