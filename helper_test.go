@@ -17,10 +17,9 @@ func TestCompareHash(t *testing.T) {
 
 func TesNewJSONResult(t *testing.T) {
 	input := []struct{}{}
-	result := NewJSONResult(input, 0, 1, "")
+	result := NewJSONResult(input, 1)
 	assert.Equal(t, *result, JSONResult{
 		Data:        input,
-		Total:       0,
 		CurrentPage: 0,
 		PerPage:     PerPage,
 	})
@@ -37,10 +36,9 @@ func TesNewJSONResult(t *testing.T) {
 			email: "test@example.com",
 		},
 	}
-	result = NewJSONResult(input2, 1, 1, "")
+	result = NewJSONResult(input2, 1)
 	assert.Equal(t, *result, JSONResult{
 		Data:        input2,
-		Total:       1,
 		CurrentPage: 1,
 		PerPage:     PerPage,
 	})

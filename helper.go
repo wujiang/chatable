@@ -47,24 +47,20 @@ type JSONResult struct {
 	Data        interface{} `json:"data"`
 	Error       JSONError   `json:"error"`
 	Page        int         `json:"page"`
-	Total       int         `json:"total"`
 	CurrentPage int         `json:"current_page"`
 	PerPage     int         `json:"per_page"`
-	NextURL     string      `json:"next_url"`
 }
 
 // NewJSONResult returns a unified JSON response.
-func NewJSONResult(v interface{}, total int, page int, next string) *JSONResult {
+func NewJSONResult(v interface{}, page int) *JSONResult {
 	val := reflect.ValueOf(v)
 	return &JSONResult{
 		Status:      "success",
 		Error:       JSONError{Code: http.StatusOK},
 		Data:        v,
-		Total:       total,
 		CurrentPage: val.Len(),
 		PerPage:     PerPage,
 		Page:        page,
-		NextURL:     next,
 	}
 }
 
@@ -73,7 +69,6 @@ func NewErrorJSONResult(err JSONError, page int) *JSONResult {
 		Status:      "fail",
 		Error:       err,
 		Data:        []struct{}{},
-		Total:       0,
 		CurrentPage: 0,
 		PerPage:     PerPage,
 		Page:        page,

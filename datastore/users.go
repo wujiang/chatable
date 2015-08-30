@@ -14,7 +14,14 @@ func init() {
 
 // Implement the UserService
 
-// GetByUsername returns a user by username
+// GetByID returns a user with the given user_id
+func (us *userStore) GetByID(id int) (*asapp.User, error) {
+	var u asapp.User
+	err := us.dbh.SelectOne(&u, `select * from users where id = $1`, id)
+	return &u, err
+}
+
+// GetByUsername returns a user with the given username
 func (us *userStore) GetByUsername(uname string) (*asapp.User, error) {
 	var u asapp.User
 	err := us.dbh.SelectOne(&u, `select * from users where username = $1`,

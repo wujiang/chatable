@@ -32,6 +32,28 @@ func (env *Envelope) IsDeleted() bool {
 	return env.DeletedAt.Valid
 }
 
+func (env *Envelope) ToPublic() *PublicEnvelope {
+	var author int
+	if env.IsIncoming {
+		author = env.WithUserID
+	} else {
+		author = env.UserID
+	}
+	return &PublicEnvelope{
+		Author:      author,
+		Message:     env.Message,
+		MessageType: env.MessageType,
+		CreatedAt:   env.CreatedAt.Time,
+	}
+}
+
+type PublicEnvelope struct {
+	Author      int       `json:"author"`
+	Message     string    `json:"message"`
+	MessageType int       `json:"message_type"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 // NewEnvelope creates the incoming and outgoing envelopes. The first
 // envelope is the envelope on the sender's side, and the second
 // envelope is the envelope on the receipt's side.
