@@ -30,16 +30,6 @@ var (
 		testRecipientPhone, testIPAddr)
 )
 
-// createTables creates all registered tables. This is used by tests.
-func createTables() error {
-	return dbm.CreateTablesIfNotExists()
-}
-
-// dropTables drops all registered tables. This is used by tests.
-func dropTables() error {
-	return dbm.DropTablesIfExists()
-}
-
 func newTestUsers() error {
 	if err := testStore.UserStore.Create(testSender); err != nil {
 		return err

@@ -63,7 +63,7 @@ var keyfunc = func(tk *jwt.Token) (interface{}, error) {
 		return nil, ErrUnauthenticated
 	}
 	tk.Header["user"] = user
-	tk.Header["at"] = at
+	tk.Header["auth"] = at
 	return []byte(at.SecretAccessKey), nil
 }
 
@@ -73,12 +73,12 @@ func TokenAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundErr
 		return ErrUnauthenticated
 	}
 	context.Set(r, "user", token.Header["user"])
-	context.Set(r, "at", token.Header["at"])
+	context.Set(r, "auth", token.Header["auth"])
 	return nil
 }
 
 func TokenUnAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
-	at := context.Get(r, "at")
+	at := context.Get(r, "auth")
 	if at == nil {
 		return ErrUnauthenticated
 	}

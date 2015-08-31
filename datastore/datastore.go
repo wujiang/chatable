@@ -60,3 +60,13 @@ func NewDataStore(dbh gorp.SqlExecutor) *DataStore {
 	ds.AuthTokenStore = &authtokenStore{ds}
 	return ds
 }
+
+// CreateTables creates all registered tables. This is used by tests.
+func CreateTables() error {
+	return dbm.CreateTablesIfNotExists()
+}
+
+// DropTables drops all registered tables. This is used by tests.
+func DropTables() error {
+	return dbm.DropTablesIfExists()
+}

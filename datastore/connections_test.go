@@ -12,12 +12,12 @@ type ConnectionsTestSuite struct {
 
 func (c *ConnectionsTestSuite) SetupTest() {
 	Init(testDB)
-	createTables()
+	CreateTables()
 	newTestUsers()
 }
 
 func (c *ConnectionsTestSuite) TearDownTest() {
-	dropTables()
+	DropTables()
 	Exit()
 }
 
