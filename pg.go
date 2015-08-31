@@ -25,6 +25,8 @@ func (nt *NullTime) Scan(src interface{}) error {
 	case []byte:
 		dt, err := time.Parse(time.RFC3339Nano, string(s))
 		nt.Time, nt.Valid = dt, err == nil
+	case time.Time:
+		nt.Time, nt.Valid = src.(time.Time)
 	case nil:
 		nt.Valid = false
 	default:

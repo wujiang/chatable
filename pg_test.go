@@ -19,6 +19,12 @@ func TestNullTimeScan(t *testing.T) {
 	assert.Equal(t, time.Date(2006, 1, 2, 15, 4, 5, 999999999, time.UTC),
 		nt.Time)
 
+	err = nt.Scan(time.Date(2006, 1, 2, 15, 4, 5, 999999999, time.UTC))
+	assert.Nil(t, err)
+	assert.True(t, nt.Valid)
+	assert.Equal(t, time.Date(2006, 1, 2, 15, 4, 5, 999999999, time.UTC),
+		nt.Time)
+
 	err = nt.Scan("2006-01-02T15:04:05.999999999Z")
 	assert.NotNil(t, err)
 }

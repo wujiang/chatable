@@ -19,12 +19,14 @@ var (
 
 func Handler() *mux.Router {
 	m := router.API()
+
 	m.Get(router.Register).Handler(handler(serveRegister))
 	m.Get(router.CreateAuthToken).Handler(handler(serveCreateAuthToken))
 	m.Get(router.DeactivateAuthToken).
 		Handler(Authenticate(handler(serveDeactivateAuthToken)))
 	m.Get(router.GetInbox).Handler(Authenticate(handler(serveGetThreads)))
 	m.Get(router.GetThread).Handler(Authenticate(handler(serveGetEnvelopes)))
+
 	return m
 }
 

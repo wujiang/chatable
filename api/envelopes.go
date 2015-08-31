@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -18,10 +19,11 @@ func serveGetEnvelopes(w http.ResponseWriter, r *http.Request) asapp.CompoundErr
 	// TODO: get uid from request
 	activeUserID := 1
 	withUser, err := store.UserStore.GetByUsername(withUsername)
-	if err != nil {
+	if err == sql.ErrNoRows {
 		return asapp.NewUserError("unknown username")
+	} else if err != nil {
+		return asapp.NewServerError(err.Error())
 	}
-
 	envelopes, err := store.EnvelopeStore.GetByUserIDWithUserID(activeUserID,
 		withUser.ID, offset)
 	if err != nil {
