@@ -12,6 +12,20 @@ type Thread struct {
 	LatestMessage string   `db:"latest_message"`
 }
 
+func (t *Thread) ToPublic() *PublicThread {
+	return &PublicThread{
+		WithUsername:  t.WithUsername,
+		CreatedAt:     t.CreatedAt.Time,
+		LatestMessage: t.LatestMessage,
+	}
+}
+
+type PublicThread struct {
+	WithUsername  string    `json:"with_username"`
+	CreatedAt     time.Time `json:"created_at"`
+	LatestMessage string    `json:"latest_message"`
+}
+
 // NewThread creates a new thread
 func NewThread(uid int, withuid int, withuname string, msg string) *Thread {
 	return &Thread{

@@ -13,12 +13,12 @@ type EnvelopesTestSuite struct {
 
 func (s *EnvelopesTestSuite) SetupTest() {
 	Init(testDB)
-	createTables()
+	CreateTables()
 	newTestUsers()
 }
 
 func (s *EnvelopesTestSuite) TearDownTest() {
-	dropTables()
+	DropTables()
 	Exit()
 }
 

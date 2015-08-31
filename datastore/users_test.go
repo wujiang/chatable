@@ -13,12 +13,12 @@ type UsersTestSuite struct {
 
 func (s *UsersTestSuite) SetupTest() {
 	Init(testDB)
-	createTables()
+	CreateTables()
 	newTestUsers()
 }
 
 func (s *UsersTestSuite) TearDownTest() {
-	dropTables()
+	DropTables()
 	Exit()
 }
 

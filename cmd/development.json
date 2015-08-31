@@ -1,0 +1,4 @@
+{
+    "postgres": "postgres://asapp@localhost:5432/asapp?sslmode=disable",
+    "host": ":8080"
+}

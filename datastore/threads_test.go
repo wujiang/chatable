@@ -13,12 +13,12 @@ type ThreadsTestSuite struct {
 
 func (t *ThreadsTestSuite) SetupTest() {
 	Init(testDB)
-	createTables()
+	CreateTables()
 	newTestUsers()
 }
 
 func (t *ThreadsTestSuite) TearDownTest() {
-	dropTables()
+	DropTables()
 	Exit()
 }
 
