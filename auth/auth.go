@@ -92,3 +92,11 @@ func TokenUnAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundE
 	}
 	return nil
 }
+
+func ActiveUser(r *http.Request) *asapp.User {
+	user, ok := context.Get(r, "user").(*asapp.User)
+	if !ok {
+		return nil
+	}
+	return user
+}
