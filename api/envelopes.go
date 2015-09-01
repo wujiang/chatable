@@ -38,7 +38,7 @@ func serveGetEnvelopes(w http.ResponseWriter, r *http.Request) asapp.CompoundErr
 	}
 	var pubEnv []*asapp.PublicEnvelope
 	for _, env := range envelopes {
-		pubEnv = append(pubEnv, env.ToPublic())
+		pubEnv = append(pubEnv, env.ToPublic(store.UserStore))
 	}
 
 	return writeJSON(w, asapp.NewJSONResult(pubEnv, page))

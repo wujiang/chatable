@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
@@ -24,7 +25,7 @@ var (
 
 	h = hub{
 		connections: make(map[string][]*connection),
-		outgoing:    make(chan message),
+		outgoing:    make(chan asapp.PublicEnvelope),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
 	}
@@ -43,24 +44,23 @@ func parseText(msg string) (string, string) {
 type connection struct {
 	conn   *websocket.Conn
 	uname  string
-	outbuf chan message
+	outbuf chan asapp.PublicEnvelope
 }
 
 func (c *connection) read() {
 	for {
-		_, msg, err := c.conn.ReadMessage()
+		var env asapp.PublicEnvelope
+		err := c.conn.ReadJSON(&env)
 		if err != nil {
-			break
-		}
-		recipient, m := parseText(string(msg))
-		fmt.Println("recipient: ", recipient, ", msg: ", m)
-		if recipient == "" {
+			glog.Warning(err)
 			continue
 		}
-		h.outgoing <- message{
-			sender:    c.uname,
-			recipient: recipient,
-			msg:       m,
+		h.outgoing <- asapp.PublicEnvelope{
+			Author:      env.Author,
+			Recipient:   env.Recipient,
+			Message:     env.Message,
+			MessageType: asapp.MessageTypeText,
+			CreatedAt:   time.Now().UTC(),
 		}
 	}
 }
@@ -72,21 +72,14 @@ func (c *connection) write() {
 			if !ok {
 				continue
 			}
-			msg := fmt.Sprintf("[%s] %s", message.sender, message.msg)
-			c.conn.WriteMessage(websocket.TextMessage, []byte(msg))
+			c.conn.WriteJSON(message)
 		}
 	}
 }
 
-type message struct {
-	sender    string
-	recipient string
-	msg       string // TODO: other types
-}
-
 type hub struct {
 	connections map[string][]*connection
-	outgoing    chan message
+	outgoing    chan asapp.PublicEnvelope
 	register    chan *connection
 	unregister  chan *connection
 }
@@ -111,7 +104,7 @@ func (h *hub) exec() {
 			}
 			h.connections[c.uname] = newConns
 		case m := <-h.outgoing:
-			conns := h.connections[m.recipient]
+			conns := h.connections[m.Recipient]
 			newConns := []*connection{}
 			for _, c := range conns {
 				select {
@@ -121,7 +114,7 @@ func (h *hub) exec() {
 					close(c.outbuf)
 				}
 			}
-			h.connections[m.recipient] = newConns
+			h.connections[m.Recipient] = newConns
 		}
 
 	}
@@ -144,7 +137,7 @@ func serveWSConnect(w http.ResponseWriter, r *http.Request) asapp.CompoundError 
 	c := &connection{
 		conn:   ws,
 		uname:  activeUser.Username,
-		outbuf: make(chan message),
+		outbuf: make(chan asapp.PublicEnvelope),
 	}
 
 	h.register <- c
