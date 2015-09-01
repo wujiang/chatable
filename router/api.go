@@ -12,5 +12,7 @@ func API() *mux.Router {
 	m.Path("/thread/{username:[a-zA-Z]\\w+}").Methods("GET").
 		Name(GetThread)
 
+	m.Path("/ws").Methods("GET").Name(WSConnect)
+
 	return m
 }

@@ -27,6 +27,8 @@ func Handler() *mux.Router {
 	m.Get(router.GetInbox).Handler(Authenticate(handler(serveGetThreads)))
 	m.Get(router.GetThread).Handler(Authenticate(handler(serveGetEnvelopes)))
 
+	m.Get(router.WSConnect).Handler(Authenticate(handler(serveWSConnect)))
+
 	return m
 }
 
