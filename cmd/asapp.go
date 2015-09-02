@@ -62,21 +62,18 @@ Options:
 		glog.Fatal(err)
 	}
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		glog.Fatal(err)
-	}
-
 	// initialize database connection
 	datastore.Init(cfg.Postgres)
 	defer datastore.Exit()
 
+	// initialize redis
 	rds.Init(cfg.RedisHost)
-	go api.Hub.Run(hostname, cfg.SharedQueueKey)
 
 	rdsPool := rds.NewRdsPool(nil)
 	rdsPool.AddToQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
 	defer rdsPool.RemoveFromQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
+
+	go api.Hub.Run(cfg.SharedQueueKey)
 
 	qm := api.QueueManager{}
 	go qm.Dispatch(cfg.SharedQueueKey, cfg.QueueManagerKey)

@@ -99,8 +99,8 @@ type hub struct {
 	unregister  chan *connection
 }
 
-// Run does all necessary dispatching work.
-func (h *hub) Run(host string, queue string) {
+// Run manages all the channels.
+func (h *hub) Run(queue string) {
 	for {
 		select {
 		case c := <-h.register:
