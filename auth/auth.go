@@ -39,13 +39,6 @@ type Token struct {
 	RefreshToken string
 }
 
-const (
-	TokenBearer = "Bearer"
-	TokenJWT    = "JWT"
-	ISS         = "asappd:JWT"
-	ALG         = "HS256"
-)
-
 // keyfunc retrieves the secret access key from db using the access key id
 // provided by user
 var keyfunc = func(tk *jwt.Token) (interface{}, error) {

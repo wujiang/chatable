@@ -12,7 +12,12 @@ func init() {
 
 func (as *authtokenStore) GetByAccessKeyID(key string) (*asapp.AuthToken, error) {
 	var t asapp.AuthToken
-	err := as.dbh.SelectOne(&t, `select * from auth_tokens where access_key_id = $1`, key)
+	query := `select *
+                from auth_tokens
+                where access_key_id = $1
+                        and is_active is true
+                        and expires_at >= now()`
+	err := as.dbh.SelectOne(&t, query, key)
 	return &t, err
 }
 
