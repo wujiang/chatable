@@ -38,11 +38,10 @@ func Exit() {
 
 // Database is the portal to database
 type DataStore struct {
-	UserStore       asapp.UserService
-	ThreadStore     asapp.ThreadService
-	EnvelopeStore   asapp.EnvelopeService
-	ConnectionStore asapp.ConnectionService
-	AuthTokenStore  asapp.AuthTokenService
+	UserStore      asapp.UserService
+	ThreadStore    asapp.ThreadService
+	EnvelopeStore  asapp.EnvelopeService
+	AuthTokenStore asapp.AuthTokenService
 
 	dbh gorp.SqlExecutor
 }
@@ -56,7 +55,6 @@ func NewDataStore(dbh gorp.SqlExecutor) *DataStore {
 	ds.UserStore = &userStore{ds}
 	ds.ThreadStore = &threadStore{ds}
 	ds.EnvelopeStore = &envelopeStore{ds}
-	ds.ConnectionStore = &connectionStore{ds}
 	ds.AuthTokenStore = &authtokenStore{ds}
 	return ds
 }

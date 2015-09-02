@@ -1,6 +1,11 @@
 package datastore
 
-import "gitlab.com/wujiang/asapp"
+import (
+	"strconv"
+	"strings"
+
+	"gitlab.com/wujiang/asapp"
+)
 
 type userStore struct{ *DataStore }
 
@@ -19,6 +24,25 @@ func (us *userStore) GetByID(id int) (*asapp.User, error) {
 	var u asapp.User
 	err := us.dbh.SelectOne(&u, `select * from users where id = $1`, id)
 	return &u, err
+}
+
+// GetByIDs returns a list of users with the given ids
+func (us *userStore) GetByIDs(ids ...int) ([]*asapp.User, error) {
+	var u asapp.User
+	var users []*asapp.User
+	query := "select * from users where id = any($1::integer[])"
+	var sids []string
+	for _, id := range ids {
+		sids = append(sids, strconv.Itoa(id))
+	}
+	arg := "{" + strings.Join(sids, ",") + "}"
+	us_, err := us.dbh.Select(&u, query, arg)
+	if err == nil {
+		for _, u_ := range us_ {
+			users = append(users, u_.(*asapp.User))
+		}
+	}
+	return users, err
 }
 
 // GetByUsername returns a user with the given username

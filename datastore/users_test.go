@@ -22,6 +22,26 @@ func (s *UsersTestSuite) TearDownTest() {
 	Exit()
 }
 
+func (s *UsersTestSuite) TestGetByID() {
+	user, err := testStore.UserStore.GetByID(1)
+	s.Equal(testSender.Username, user.Username)
+	s.Equal(testSender.Email, user.Email)
+	s.Equal(testSender.PhoneNumber, user.PhoneNumber)
+	s.Equal(testSender.Password, user.Password)
+	s.Nil(err)
+}
+
+func (s *UsersTestSuite) TestGetByIDs() {
+	users, err := testStore.UserStore.GetByIDs(1, 2)
+	s.Equal(2, len(users))
+	s.Nil(err)
+	// s.Equal(testSender.Username, user.Username)
+	// s.Equal(testSender.Email, user.Email)
+	// s.Equal(testSender.PhoneNumber, user.PhoneNumber)
+	// s.Equal(testSender.Password, user.Password)
+	s.Nil(err)
+}
+
 func (s *UsersTestSuite) TestGetByUsername() {
 	user, err := testStore.UserStore.GetByUsername(testSenderUname)
 	s.Equal(testSender.Username, user.Username)

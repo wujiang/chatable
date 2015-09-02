@@ -1,4 +1,8 @@
 {
     "postgres": "postgres://asapp@localhost:5432/asapp?sslmode=disable",
-    "host": ":8080"
+    "host": ":8080",
+    "redis_host": "localhost:6379",
+    "shared_queue_key": "development:envelope:shared",
+    "message_queue_key": "development:envelope:ark",
+    "queue_manager_key": "development:queue_manager"
 }

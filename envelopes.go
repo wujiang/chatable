@@ -1,6 +1,10 @@
 package asapp
 
-import "time"
+import (
+	"time"
+
+	"github.com/golang/glog"
+)
 
 const (
 	MessageTypeText = iota
@@ -32,15 +36,32 @@ func (env *Envelope) IsDeleted() bool {
 	return env.DeletedAt.Valid
 }
 
-func (env *Envelope) ToPublic() *PublicEnvelope {
-	var author int
+func (env *Envelope) ToPublic(us UserService) *PublicEnvelope {
+	users, err := us.GetByIDs(env.UserID, env.WithUserID)
+	if err != nil {
+		glog.Warning("Envelope.ToPublic expects 2 valid users")
+		return nil
+	}
+	var user, withUser *User
+	for _, u := range users {
+		if u.ID == env.UserID {
+			user = u
+		}
+		if u.ID == env.WithUserID {
+			withUser = u
+		}
+	}
+	var author, recipient string
 	if env.IsIncoming {
-		author = env.WithUserID
+		author = withUser.Username
+		recipient = user.Username
 	} else {
-		author = env.UserID
+		author = user.Username
+		recipient = withUser.Username
 	}
 	return &PublicEnvelope{
 		Author:      author,
+		Recipient:   recipient,
 		Message:     env.Message,
 		MessageType: env.MessageType,
 		CreatedAt:   env.CreatedAt.Time,
@@ -48,7 +69,8 @@ func (env *Envelope) ToPublic() *PublicEnvelope {
 }
 
 type PublicEnvelope struct {
-	Author      int       `json:"author"`
+	Author      string    `json:"author"`
+	Recipient   string    `json:"recipient"`
 	Message     string    `json:"message"`
 	MessageType int       `json:"message_type"`
 	CreatedAt   time.Time `json:"created_at"`

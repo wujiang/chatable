@@ -10,6 +10,7 @@ import (
 	"github.com/golang/glog"
 	"gitlab.com/wujiang/asapp/api"
 	"gitlab.com/wujiang/asapp/datastore"
+	"gitlab.com/wujiang/asapp/rds"
 )
 
 var (
@@ -64,6 +65,19 @@ Options:
 	// initialize database connection
 	datastore.Init(cfg.Postgres)
 	defer datastore.Exit()
+
+	// initialize redis
+	rds.Init(cfg.RedisHost)
+
+	rdsPool := rds.NewRdsPool(nil)
+	rdsPool.AddToQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
+	defer rdsPool.RemoveFromQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
+
+	go api.Hub.Run(cfg.SharedQueueKey)
+
+	qm := api.QueueManager{}
+	go qm.Dispatch(cfg.SharedQueueKey, cfg.QueueManagerKey)
+	go qm.Pop(cfg.MessageQueueKey)
 
 	subcmd := flag.Arg(0)
 	for _, c := range subcmds {

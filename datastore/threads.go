@@ -18,8 +18,7 @@ func init() {
 func (ts *threadStore) GetByUserID(uid int, offset int) ([]*asapp.Thread, error) {
 	var t asapp.Thread
 	query := `
-                select id, user_id, with_user_id, with_username, created_at,
-                        latest_message
+                select *
                 from threads
                 where user_id = $1
                 order by created_at desc
@@ -45,13 +44,13 @@ func (ts *threadStore) Upsert(t *asapp.Thread) (int64, error) {
                         set created_at = $1, latest_message = $2
                         where user_id = $3 and with_user_id = $4
                         returning *)
-                insert into threads (user_id, with_user_id, with_username,
+                insert into threads (user_id, with_user_id, author_username,
                         created_at, latest_message)
                         select $3, $4, $5, $1, $2
                 where not exists (select * from upsert)
                 `
 	result, err := ts.dbh.Exec(query, t.CreatedAt, t.LatestMessage,
-		t.UserID, t.WithUserID, t.WithUsername)
+		t.UserID, t.WithUserID, t.AuthorUsername)
 	if err != nil {
 		return int64(0), err
 	}

@@ -54,6 +54,7 @@ type UserWithToken struct {
 // UserService defines the protocol for users
 type UserService interface {
 	GetByID(id int) (*User, error)
+	GetByIDs(ids ...int) ([]*User, error)
 	GetByUsername(uname string) (*User, error)
 	Create(u *User) error
 	Update(u *User) (int64, error)

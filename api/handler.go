@@ -8,13 +8,15 @@ import (
 	"github.com/gorilla/mux"
 	"gitlab.com/wujiang/asapp"
 	"gitlab.com/wujiang/asapp/datastore"
+	"gitlab.com/wujiang/asapp/rds"
 	"gitlab.com/wujiang/asapp/router"
 
 	goerrors "github.com/go-errors/errors"
 )
 
 var (
-	store = datastore.NewDataStore(nil)
+	store   = datastore.NewDataStore(nil)
+	rdsPool = rds.NewRdsPool(nil)
 )
 
 func Handler() *mux.Router {
@@ -26,6 +28,8 @@ func Handler() *mux.Router {
 		Handler(Authenticate(handler(serveDeactivateAuthToken)))
 	m.Get(router.GetInbox).Handler(Authenticate(handler(serveGetThreads)))
 	m.Get(router.GetThread).Handler(Authenticate(handler(serveGetEnvelopes)))
+
+	m.Get(router.WSConnect).Handler(Authenticate(handler(serveWSConnect)))
 
 	return m
 }

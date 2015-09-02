@@ -6,4 +6,5 @@ const (
 	DeactivateAuthToken = "auth_token:delete"
 	GetInbox            = "inbox:get"
 	GetThread           = "thread:get"
+	WSConnect           = "websocket:get"
 )
