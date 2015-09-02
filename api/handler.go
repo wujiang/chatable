@@ -16,7 +16,7 @@ import (
 
 var (
 	store   = datastore.NewDataStore(nil)
-	rdsConn = rds.NewRdsConn(nil)
+	rdsPool = rds.NewRdsPool(nil)
 )
 
 func Handler() *mux.Router {

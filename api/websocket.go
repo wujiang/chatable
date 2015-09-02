@@ -53,7 +53,6 @@ func (c *connection) read() {
 			glog.Warning(err.Error())
 			continue
 		}
-		fmt.Println("read", env)
 		Hub.outgoing <- asapp.PublicEnvelope{
 			Author:      env.Author,
 			Recipient:   env.Recipient,
@@ -64,13 +63,9 @@ func (c *connection) read() {
 	}
 }
 
-// close does a cleanup of a connection by closing the channel and deleting
-// the connection row in database.
+// close does a cleanup of a connection by closing the outbound channel.
 func (c *connection) close() {
 	close(c.outbuf)
-	// if err := store.ConnectionStore.DeleteByID(c.id); err != nil {
-	// 	glog.Error(err)
-	// }
 }
 
 func (c *connection) write() {
@@ -110,12 +105,6 @@ func (h *hub) Run(host string, queue string) {
 		select {
 		case c := <-h.register:
 			glog.Info(fmt.Sprintf("new connection from %s", c.uname))
-			// c_ := asapp.NewConnection(c.uid, host)
-			// err := store.ConnectionStore.Create(c_)
-			// if err != nil {
-			// 	glog.Error(err)
-			// }
-			// c.id = c_.ID
 			h.connections[c.uname] = append(h.connections[c.uname],
 				c)
 
@@ -132,21 +121,9 @@ func (h *hub) Run(host string, queue string) {
 			}
 			h.connections[c.uname] = newConns
 		case m := <-h.outgoing:
-			fmt.Println("enqueue", queue)
-			if err := rdsConn.Enqueue(queue, m); err != nil {
+			if err := rdsPool.Enqueue(queue, m); err != nil {
 				glog.Error(err)
 			}
-			// conns := h.connections[m.Recipient]
-			// newConns := []*connection{}
-			// for _, c := range conns {
-			// 	select {
-			// 	case c.outbuf <- m:
-			// 		newConns = append(newConns, c)
-			// 	default:
-			// 		close(c.outbuf)
-			// 	}
-			// }
-			// h.connections[m.Recipient] = newConns
 		}
 
 	}

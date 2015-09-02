@@ -74,9 +74,9 @@ Options:
 	rds.Init(cfg.RedisHost)
 	go api.Hub.Run(hostname, cfg.SharedQueueKey)
 
-	rdsConn := rds.NewRdsConn(nil)
-	rdsConn.AddToQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
-	defer rdsConn.RemoveFromQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
+	rdsPool := rds.NewRdsPool(nil)
+	rdsPool.AddToQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
+	defer rdsPool.RemoveFromQM(cfg.QueueManagerKey, cfg.MessageQueueKey)
 
 	qm := api.QueueManager{}
 	go qm.Dispatch(cfg.SharedQueueKey, cfg.QueueManagerKey)

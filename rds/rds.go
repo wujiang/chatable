@@ -3,6 +3,7 @@ package rds
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/golang/glog"
@@ -10,48 +11,60 @@ import (
 )
 
 var (
-	// sharable connection to redis
-	conn    redis.Conn
-	rdsConn = &RdsConn{
-		conn: &conn,
+	// shared pool
+	rdsPool = &RdsPool{
+		pool: &redis.Pool{},
 	}
 )
 
 func Init(host string) {
-	conn, err := redis.Dial("tcp", host)
-	if err != nil {
-		glog.Fatal(err)
+	p := redis.Pool{
+		MaxIdle: 5,
+		Dial: func() (redis.Conn, error) {
+			conn, err := redis.Dial("tcp", host)
+			if err != nil {
+				glog.Error(err)
+			}
+			return conn, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			return err
+		},
 	}
-	*rdsConn.conn = conn
+	*rdsPool.pool = p
 }
 
 func Exit() {
-	(*rdsConn.conn).Close()
+	rdsPool.pool.Close()
 }
 
-type RdsConn struct {
-	conn *redis.Conn
+type RdsPool struct {
+	pool *redis.Pool
 }
 
-// NewRdsConn returns a new instance.
-func NewRdsConn(conn *redis.Conn) *RdsConn {
-	if conn == nil {
-		conn = rdsConn.conn
+// NewRdsPool returns a new instance.
+func NewRdsPool(pool *redis.Pool) *RdsPool {
+	if pool == nil {
+		pool = rdsPool.pool
 	}
-	return &RdsConn{
-		conn: conn,
+	return &RdsPool{
+		pool: pool,
 	}
 }
 
 // Implementation of RdsService
 
 // Enqueue pushes a PublicEnvelope into the tail of a given queue.
-func (r *RdsConn) Enqueue(queue string, env asapp.PublicEnvelope) asapp.CompoundError {
+func (r *RdsPool) Enqueue(queue string, env asapp.PublicEnvelope) asapp.CompoundError {
+	conn := r.pool.Get()
+	defer conn.Close()
+
 	bt, err := json.Marshal(env)
 	if err != nil {
 		return asapp.NewServerError(fmt.Sprintf("Can not marshal %+v", env))
 	}
-	if _, err = (*r.conn).Do("RPUSH", queue, bt); err != nil {
+	if _, err = conn.Do("RPUSH", queue, bt); err != nil {
 		return asapp.NewServerError(err.Error())
 	}
 	return nil
@@ -59,9 +72,12 @@ func (r *RdsConn) Enqueue(queue string, env asapp.PublicEnvelope) asapp.Compound
 
 // Dequeue pops the first element from the given queue. This is a blocking
 // operation.
-func (r *RdsConn) Dequeue(queue string) (asapp.PublicEnvelope, asapp.CompoundError) {
+func (r *RdsPool) Dequeue(queue string) (asapp.PublicEnvelope, asapp.CompoundError) {
+	conn := r.pool.Get()
+	defer conn.Close()
+
 	var env asapp.PublicEnvelope
-	val, err := redis.Values((*r.conn).Do("BLPOP", queue, 0))
+	val, err := redis.Values(conn.Do("BLPOP", queue, 0))
 	if err != nil {
 		return env, asapp.NewServerError(err.Error())
 	}
@@ -75,24 +91,33 @@ func (r *RdsConn) Dequeue(queue string) (asapp.PublicEnvelope, asapp.CompoundErr
 	return env, nil
 }
 
-func (r *RdsConn) AddToQM(key string, queue string) asapp.CompoundError {
-	_, err := (*r.conn).Do("SADD", key, queue)
+func (r *RdsPool) AddToQM(key string, queue string) asapp.CompoundError {
+	conn := r.pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SADD", key, queue)
 	if err != nil {
 		return asapp.NewServerError(err.Error())
 	}
 	return nil
 }
 
-func (r *RdsConn) QMMembers(key string) ([]string, asapp.CompoundError) {
-	val, err := redis.Strings((*r.conn).Do("SMEMBERS", key))
+func (r *RdsPool) QMMembers(key string) ([]string, asapp.CompoundError) {
+	conn := r.pool.Get()
+	defer conn.Close()
+
+	val, err := redis.Strings(conn.Do("SMEMBERS", key))
 	if err != nil {
 		return []string{}, asapp.NewServerError(err.Error())
 	}
 	return val, nil
 }
 
-func (r *RdsConn) RemoveFromQM(key string, queue string) asapp.CompoundError {
-	_, err := (*r.conn).Do("SREM", key, queue)
+func (r *RdsPool) RemoveFromQM(key string, queue string) asapp.CompoundError {
+	conn := r.pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SREM", key, queue)
 	if err != nil {
 		return asapp.NewServerError(err.Error())
 	}
