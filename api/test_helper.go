@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/dgrijalva/jwt-go"
+
 	"gitlab.com/wujiang/asapp"
 )
 
@@ -36,7 +38,7 @@ func helperCreateUser() *asapp.User {
 func helperAuthToken(host string) (asapp.PublicToken, error) {
 	endpoint := strings.Join([]string{host, "/auth_token"}, "")
 	payload := url.Values{
-		"email":    []string{testUserEmail},
+		"username": []string{testUsername},
 		"password": []string{testUserPass},
 	}
 	resp, err := http.PostForm(endpoint, payload)
@@ -55,4 +57,18 @@ func helperAuthToken(host string) (asapp.PublicToken, error) {
 		return asapp.PublicToken{}, err
 	}
 	return data.Data[0], nil
+}
+
+func helperAuthHeader(host string, payload map[string]string) (string, error) {
+	at, err := helperAuthToken(host)
+	if err != nil {
+		return "", err
+	}
+	token := jwt.New(jwt.SigningMethodHS256)
+	for _, k := range payload {
+		token.Claims[k] = payload[k]
+	}
+	token.Header["access_key"] = at.AccessKeyID
+	t, err := token.SignedString([]byte(at.SecretAccessKey))
+	return t, err
 }

@@ -145,6 +145,6 @@ func (s *UsersTestSuite) TestCreateUsers() {
 	s.NotNil(data.Data[0].Token)
 }
 
-func TestUsersV1(t *testing.T) {
+func TestUsers(t *testing.T) {
 	suite.Run(t, new(UsersTestSuite))
 }

@@ -62,5 +62,8 @@ func serveCreateAuthToken(w http.ResponseWriter, r *http.Request) asapp.Compound
 }
 
 func serveDeactivateAuthToken(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
-	return auth.TokenUnAuthenticate(w, r)
+	if err := auth.TokenUnAuthenticate(w, r); err != nil {
+		return err
+	}
+	return writeJSON(w, asapp.NewJSONResult([]*asapp.PublicToken{}, 1))
 }
