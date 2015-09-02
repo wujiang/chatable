@@ -80,3 +80,36 @@ func GenerateRandomKey() string {
 	rb := securecookie.GenerateRandomKey(32)
 	return strings.TrimRight(base32.StdEncoding.EncodeToString(rb), "=")
 }
+
+// PersistEnvelope saves thread and 2 envelopes from a PublicEnvelope.
+func PersistEnvelope(p PublicEnvelope, us UserService, es EnvelopeService,
+	ts ThreadService) CompoundError {
+	sender, err := us.GetByUsername(p.Author)
+	if err != nil {
+		return NewServerError(err.Error())
+	}
+	recipient, err := us.GetByUsername(p.Recipient)
+	if err != nil {
+		return NewServerError(err.Error())
+	}
+
+	// persist envelopes
+	senderEnv, recipientEnv := NewEnvelope(sender.ID, recipient.ID,
+		p.Message, p.MessageType)
+	if err = es.Create(senderEnv); err != nil {
+		return NewServerError(err.Error())
+	}
+	if err = es.Create(recipientEnv); err != nil {
+		return NewServerError(err.Error())
+	}
+
+	// persist threads
+	t1, t2 := NewThread(sender.ID, recipient.ID, sender.Username, p.Message)
+	if _, err = ts.Upsert(t1); err != nil {
+		return NewServerError(err.Error())
+	}
+	if _, err = ts.Upsert(t2); err != nil {
+		return NewServerError(err.Error())
+	}
+	return nil
+}

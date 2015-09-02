@@ -18,5 +18,7 @@ func NewConnection(uid int, mq string) *Connection {
 // ConnectionService defines the protocol for connections
 type ConnectionService interface {
 	GetByUserID(uid int) ([]*Connection, error)
+	Create(c *Connection) error
+	DeleteByID(cid int) error
 	Delete(c *Connection) (int64, error)
 }

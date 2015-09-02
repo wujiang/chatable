@@ -8,13 +8,15 @@ import (
 	"github.com/gorilla/mux"
 	"gitlab.com/wujiang/asapp"
 	"gitlab.com/wujiang/asapp/datastore"
+	"gitlab.com/wujiang/asapp/rds"
 	"gitlab.com/wujiang/asapp/router"
 
 	goerrors "github.com/go-errors/errors"
 )
 
 var (
-	store = datastore.NewDataStore(nil)
+	store   = datastore.NewDataStore(nil)
+	rdsConn = rds.NewRdsConn(nil)
 )
 
 func Handler() *mux.Router {

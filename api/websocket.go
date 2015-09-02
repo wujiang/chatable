@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 const (
 	BufferedChanLen int = 10
+	heartBeat           = 5 * time.Minute
 )
 
 var (
@@ -23,7 +25,7 @@ var (
 		WriteBufferSize: 2048,
 	}
 
-	h = hub{
+	Hub = hub{
 		connections: make(map[string][]*connection),
 		outgoing:    make(chan asapp.PublicEnvelope),
 		register:    make(chan *connection),
@@ -31,31 +33,28 @@ var (
 	}
 )
 
-// parseText parses a text to get recipient and message
-// recipient: how are you? --> recipient, how are you?
-func parseText(msg string) (string, string) {
-	parts := msgRE.FindStringSubmatch(msg)
-	if len(parts) != 3 {
-		return "", ""
-	}
-	return parts[1], parts[2]
-}
-
 type connection struct {
+	id     int
 	conn   *websocket.Conn
 	uname  string
+	uid    int
 	outbuf chan asapp.PublicEnvelope
 }
 
 func (c *connection) read() {
 	for {
 		var env asapp.PublicEnvelope
+		// this blocks until new data comes in
 		err := c.conn.ReadJSON(&env)
-		if err != nil {
-			glog.Warning(err)
+		if err == io.EOF {
+			c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+			break
+		} else if err != nil {
+			glog.Warning(err.Error())
 			continue
 		}
-		h.outgoing <- asapp.PublicEnvelope{
+		fmt.Println("read", env)
+		Hub.outgoing <- asapp.PublicEnvelope{
 			Author:      env.Author,
 			Recipient:   env.Recipient,
 			Message:     env.Message,
@@ -65,14 +64,35 @@ func (c *connection) read() {
 	}
 }
 
+// close does a cleanup of a connection by closing the channel and deleting
+// the connection row in database.
+func (c *connection) close() {
+	close(c.outbuf)
+	// if err := store.ConnectionStore.DeleteByID(c.id); err != nil {
+	// 	glog.Error(err)
+	// }
+}
+
 func (c *connection) write() {
+	ticker := time.NewTicker(heartBeat)
+	defer ticker.Stop()
+	defer c.close()
+
 	for {
 		select {
 		case message, ok := <-c.outbuf:
 			if !ok {
-				continue
+				c.conn.WriteMessage(websocket.CloseMessage,
+					[]byte{})
+				return
 			}
 			c.conn.WriteJSON(message)
+		case <-ticker.C:
+			err := c.conn.WriteMessage(websocket.PingMessage,
+				[]byte{})
+			if err != nil {
+				return
+			}
 		}
 	}
 }
@@ -84,19 +104,27 @@ type hub struct {
 	unregister  chan *connection
 }
 
-func (h *hub) exec() {
+// Run does all necessary dispatching work.
+func (h *hub) Run(host string, queue string) {
 	for {
 		select {
 		case c := <-h.register:
 			glog.Info(fmt.Sprintf("new connection from %s", c.uname))
+			// c_ := asapp.NewConnection(c.uid, host)
+			// err := store.ConnectionStore.Create(c_)
+			// if err != nil {
+			// 	glog.Error(err)
+			// }
+			// c.id = c_.ID
 			h.connections[c.uname] = append(h.connections[c.uname],
 				c)
+
 		case c := <-h.unregister:
 			conns := h.connections[c.uname]
 			newConns := []*connection{}
 			for _, cn := range conns {
 				if cn.conn == c.conn {
-					close(cn.outbuf)
+					c.close()
 					glog.Info(fmt.Sprintf("close 1 connection from %s", cn.uname))
 				} else {
 					newConns = append(newConns, cn)
@@ -104,24 +132,24 @@ func (h *hub) exec() {
 			}
 			h.connections[c.uname] = newConns
 		case m := <-h.outgoing:
-			conns := h.connections[m.Recipient]
-			newConns := []*connection{}
-			for _, c := range conns {
-				select {
-				case c.outbuf <- m:
-					newConns = append(newConns, c)
-				default:
-					close(c.outbuf)
-				}
+			fmt.Println("enqueue", queue)
+			if err := rdsConn.Enqueue(queue, m); err != nil {
+				glog.Error(err)
 			}
-			h.connections[m.Recipient] = newConns
+			// conns := h.connections[m.Recipient]
+			// newConns := []*connection{}
+			// for _, c := range conns {
+			// 	select {
+			// 	case c.outbuf <- m:
+			// 		newConns = append(newConns, c)
+			// 	default:
+			// 		close(c.outbuf)
+			// 	}
+			// }
+			// h.connections[m.Recipient] = newConns
 		}
 
 	}
-}
-
-func init() {
-	go h.exec()
 }
 
 func serveWSConnect(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
@@ -137,10 +165,11 @@ func serveWSConnect(w http.ResponseWriter, r *http.Request) asapp.CompoundError 
 	c := &connection{
 		conn:   ws,
 		uname:  activeUser.Username,
+		uid:    activeUser.ID,
 		outbuf: make(chan asapp.PublicEnvelope),
 	}
 
-	h.register <- c
+	Hub.register <- c
 	go c.write()
 	c.read()
 
