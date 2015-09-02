@@ -38,7 +38,7 @@ func (env *Envelope) IsDeleted() bool {
 
 func (env *Envelope) ToPublic(us UserService) *PublicEnvelope {
 	users, err := us.GetByIDs(env.UserID, env.WithUserID)
-	if err != nil || len(users) != 2 {
+	if err != nil {
 		glog.Warning("Envelope.ToPublic expects 2 valid users")
 		return nil
 	}
@@ -46,7 +46,8 @@ func (env *Envelope) ToPublic(us UserService) *PublicEnvelope {
 	for _, u := range users {
 		if u.ID == env.UserID {
 			user = u
-		} else if u.ID == env.WithUserID {
+		}
+		if u.ID == env.WithUserID {
 			withUser = u
 		}
 	}
