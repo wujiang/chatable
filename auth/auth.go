@@ -67,6 +67,7 @@ var keyfunc = func(tk *jwt.Token) (interface{}, error) {
 	return []byte(at.SecretAccessKey), nil
 }
 
+// TokenAuthenticate authenticates a token from request.
 func TokenAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
 	token, err := jwt.ParseFromRequest(r, keyfunc)
 	if err != nil || !token.Valid {
@@ -77,6 +78,7 @@ func TokenAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundErr
 	return nil
 }
 
+// TokenUnAuthenticate deactivates a token.
 func TokenUnAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
 	at := context.Get(r, "auth")
 	if at == nil {
@@ -93,6 +95,7 @@ func TokenUnAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundE
 	return nil
 }
 
+// ActiveUser gets the authenticated user from request.
 func ActiveUser(r *http.Request) *asapp.User {
 	user, ok := context.Get(r, "user").(*asapp.User)
 	if !ok {
