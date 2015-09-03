@@ -14,6 +14,7 @@
 5. run `make local` to run the server.
 
 ### APIs
+Authorization is using [jwt](http://jwt.io/) protocol.
 
 #### `POST /api/register`
 - params:
@@ -262,6 +263,7 @@ to the recipient.
   traffic at your system a month from now. How do you prepare? They
   see roughly 1M conversations per day.
 
+Create dedicated servers and databases for Comcast. Do a stress test.
 
 - How will your system handle a user with multiple devices gracefully?
   E.g imagine a user alternating between her laptop, her phone and her
