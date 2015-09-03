@@ -206,5 +206,7 @@
     not connected; `server B` pops from `B's queue` and pushes to `alice`;
     `server C` pops from `B's queue` and pushes to `alice`.
 
+
 [1]. `go get bitbucket.org/liamstask/goose/cmd/goose`
+
 [2]. `go get github.com/tools/godep`
