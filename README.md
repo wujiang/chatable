@@ -161,6 +161,30 @@
 - endpoint: `/api/ws`
 - authentication is required
 
+- send a packet:
+
+```json
+{
+    'author': 'bob',
+    'recipient': 'alice',
+    'message': 'hello'
+}
+
+```
+
+- receive a packet
+
+```json
+{
+    'author': 'bob',
+    'recipient': 'alice',
+    'message': 'hello',
+    'message_type': 0,
+    'created_at':'2015-09-03T03:13:12.817650473Z'
+}
+
+```
+
 ### Errors
 
 ```json
