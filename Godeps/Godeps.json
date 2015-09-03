@@ -1,0 +1,78 @@
+{
+	"ImportPath": "gitlab.com/wujiang/asapp",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/coopernurse/gorp",
+			"Comment": "v1.7-1-g236e138",
+			"Rev": "236e1383df4c6b402e251d3fe2dcea50dab1faf1"
+		},
+		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v2.3.0-1-g9fe8afe",
+			"Rev": "9fe8afe96d32468fba230b8b22acea86251f0506"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "535138d7bcd717d6531c701ef5933d98b1866257"
+		},
+		{
+			"ImportPath": "github.com/go-errors/errors",
+			"Rev": "01d535a7e0d0c52e283f462be8ceeb38e5bcaeeb"
+		},
+		{
+			"ImportPath": "github.com/golang/glog",
+			"Rev": "44145f04b68cf362d9c4df2182967c2275eaefed"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "14f550f51af52180c2eefed15e5fd18d63c0a64a"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "14cafe28513321476c73967a5a4f3454b6129c46"
+		},
+		{
+			"ImportPath": "github.com/gorilla/securecookie",
+			"Rev": "aeade84400a85c6875264ae51c7a56ecdcb61751"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "ab5b3a61f5b6aa323d66ece457334396c4ccdd03"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Rev": "50a04ed4e5268fb34ca6d885202b569ef89c0a7a"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Comment": "v1.0-19-g6fe8314",
+			"Rev": "6fe8314ce5ce27f43c9a510126279fdc5d5d38fc"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/require",
+			"Comment": "v1.0-19-g6fe8314",
+			"Rev": "6fe8314ce5ce27f43c9a510126279fdc5d5d38fc"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/suite",
+			"Comment": "v1.0-19-g6fe8314",
+			"Rev": "6fe8314ce5ce27f43c9a510126279fdc5d5d38fc"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "4831188890de893ae55d9ecd1bbafc340ce0ff9f"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "4831188890de893ae55d9ecd1bbafc340ce0ff9f"
+		}
+	]
+}
