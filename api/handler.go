@@ -48,7 +48,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
 			Code:    http.StatusBadRequest,
-			Message: "User errors",
+			Message: "User error",
 			Errors:  asapp.ErrorDetails{"error": err.Error()},
 		}))
 		glog.Warning(goerr.ErrorStack())
@@ -56,7 +56,7 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
 			Code:    http.StatusBadRequest,
-			Message: "Form errors",
+			Message: "Form error",
 			Errors:  err.Details(),
 		}))
 		glog.Warning(goerr.ErrorStack())
@@ -64,15 +64,17 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
 			Code:    http.StatusUnauthorized,
-			Message: "Authentication errors",
+			Message: "Authentication error",
 			Errors:  asapp.ErrorDetails{"error": err.Error()},
 		}))
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
 			Code:    http.StatusInternalServerError,
-			Message: "Internal server errors",
-			Errors:  asapp.ErrorDetails{"error": err.Error()},
+			Message: "Internal server error",
+			Errors: asapp.ErrorDetails{
+				"error": "internal server error",
+			},
 		}))
 		fmt.Fprint(w, fmt.Sprintf("Internal server error: %s", err))
 		glog.Warning(goerr.ErrorStack())

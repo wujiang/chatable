@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"gitlab.com/wujiang/asapp"
 	"gitlab.com/wujiang/asapp/forms"
@@ -52,7 +53,14 @@ func serveCreateUser(w http.ResponseWriter, r *http.Request) asapp.CompoundError
 		usersForm.Values["phone"].(string),
 		r.RemoteAddr)
 	err := store.UserStore.Create(u)
-
+	// TODO: refine the error message
+	if err != nil {
+		msg := err.Error()
+		if strings.Contains(msg, "violates") {
+			return asapp.NewUserError("Some fileds are not unique")
+		}
+		return asapp.NewServerError(msg)
+	}
 	// create a auth token
 	token, err := createNewAuthToken(w, r, u)
 	if err != nil {
