@@ -1,4 +1,6 @@
-## A simple chat server
+## chatable
+
+A simple chat server
 
 ### How to use it
 
@@ -230,50 +232,6 @@ Authorization is using [jwt](http://jwt.io/) protocol.
   6. `server A` pops from `A's queue` and drops the message because `alice` is
     not connected; `server B` pops from `B's queue` and pushes to `alice`;
     `server C` pops from `B's queue` and pushes to `alice`.
-
-
-### QA
-
-- How will you scale your server beyond a single machine?
-
-Use a global message queue to manage all messages. See the above workflow.
-
-- How will you support a typical "home" screen which lists all
-  conversations along with their most recent message?
-
-Every time a user comes online, do a `GET /api/inbox` to get all
-threads. If a user goes to a thread, do a `GET /api/thread/[username]`
-to get paginated messages.  If a user is online, then websocket is
-connected and the user should get pushed message.
-
-- How will you deploy new versions of your code without any downtime?
-
-Users should connect to a proxy which talks to the server. The proxy should be
-simple and stable.
-
-- How will you implement picture messages? Where is image data stored?
-  How/when are thumbs generated? How are URLs decided on?
-
-Images can be stored on AWS S3 with cloudfront as a caching layer. Thumbnails
-should be generated right after the image is uploaded and before delivering
-to the recipient.
-
-
-- Imagine that Comcast will start directing their customer support
-  traffic at your system a month from now. How do you prepare? They
-  see roughly 1M conversations per day.
-
-Create dedicated servers and databases for Comcast. Do a stress test.
-
-- How will your system handle a user with multiple devices gracefully?
-  E.g imagine a user alternating between her laptop, her phone and her
-  tablet. Also imagine a user who has used the service for 3 years and
-  then adds a new device.
-
-Every time a user comes online, do a `GET /api/inbox` to get all
-threads. If a user goes to a thread, do a `GET /api/thread/[username]`
-to get paginated messages.  If a user is online, then websocket is
-connected and the user should get pushed message.
 
 
 [1]. `go get bitbucket.org/liamstask/goose/cmd/goose`

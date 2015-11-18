@@ -1,5 +1,5 @@
 {
-    "postgres": "postgres://asapp@localhost:5432/asapp?sslmode=disable",
+    "postgres": "postgres://chatable@localhost:5432/chatable?sslmode=disable",
     "host": ":8080",
     "redis_host": "localhost:6379",
     "shared_queue_key": "development:envelope:shared",
