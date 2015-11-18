@@ -1,4 +1,4 @@
-package asapp
+package chatable
 
 import (
 	"database/sql/driver"

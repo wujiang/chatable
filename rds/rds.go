@@ -7,7 +7,7 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/golang/glog"
-	"gitlab.com/wujiang/asapp"
+	"github.com/wujiang/chatable"
 )
 
 var (
@@ -56,70 +56,70 @@ func NewRdsPool(pool *redis.Pool) *RdsPool {
 // Implementation of RdsService
 
 // Enqueue pushes a PublicEnvelope into the tail of a given queue.
-func (r *RdsPool) Enqueue(queue string, env asapp.PublicEnvelope) asapp.CompoundError {
+func (r *RdsPool) Enqueue(queue string, env chatable.PublicEnvelope) chatable.CompoundError {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	bt, err := json.Marshal(env)
 	if err != nil {
-		return asapp.NewServerError(fmt.Sprintf("Can not marshal %+v", env))
+		return chatable.NewServerError(fmt.Sprintf("Can not marshal %+v", env))
 	}
 	if _, err = conn.Do("RPUSH", queue, bt); err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	return nil
 }
 
 // Dequeue pops the first element from the given queue. This is a blocking
 // operation.
-func (r *RdsPool) Dequeue(queue string) (asapp.PublicEnvelope, asapp.CompoundError) {
+func (r *RdsPool) Dequeue(queue string) (chatable.PublicEnvelope, chatable.CompoundError) {
 	conn := r.pool.Get()
 	defer conn.Close()
 
-	var env asapp.PublicEnvelope
+	var env chatable.PublicEnvelope
 	val, err := redis.Values(conn.Do("BLPOP", queue, 0))
 	if err != nil {
-		return env, asapp.NewServerError(err.Error())
+		return env, chatable.NewServerError(err.Error())
 	}
 	var q, bt []byte
 	if _, err = redis.Scan(val, &q, &bt); err != nil {
-		return env, asapp.NewServerError(err.Error())
+		return env, chatable.NewServerError(err.Error())
 	}
 	if err = json.Unmarshal(bt, &env); err != nil {
-		return env, asapp.NewServerError(err.Error())
+		return env, chatable.NewServerError(err.Error())
 	}
 	return env, nil
 }
 
-func (r *RdsPool) AddToQM(key string, queue string) asapp.CompoundError {
+func (r *RdsPool) AddToQM(key string, queue string) chatable.CompoundError {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	_, err := conn.Do("SADD", key, queue)
 	if err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	return nil
 }
 
-func (r *RdsPool) QMMembers(key string) ([]string, asapp.CompoundError) {
+func (r *RdsPool) QMMembers(key string) ([]string, chatable.CompoundError) {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	val, err := redis.Strings(conn.Do("SMEMBERS", key))
 	if err != nil {
-		return []string{}, asapp.NewServerError(err.Error())
+		return []string{}, chatable.NewServerError(err.Error())
 	}
 	return val, nil
 }
 
-func (r *RdsPool) RemoveFromQM(key string, queue string) asapp.CompoundError {
+func (r *RdsPool) RemoveFromQM(key string, queue string) chatable.CompoundError {
 	conn := r.pool.Get()
 	defer conn.Close()
 
 	_, err := conn.Do("SREM", key, queue)
 	if err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	return nil
 }

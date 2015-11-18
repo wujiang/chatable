@@ -1,4 +1,4 @@
-package asapp
+package chatable
 
 import (
 	"encoding/base32"

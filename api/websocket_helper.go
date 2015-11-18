@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/golang/glog"
-	"gitlab.com/wujiang/asapp"
+	"github.com/wujiang/chatable"
 )
 
 // just a place holder
@@ -20,7 +20,7 @@ func (qm *QueueManager) Dispatch(queue string, key string) {
 		}
 
 		// persist to db
-		if err = asapp.PersistEnvelope(env, store.UserStore,
+		if err = chatable.PersistEnvelope(env, store.UserStore,
 			store.EnvelopeStore, store.ThreadStore); err != nil {
 			glog.Error(err.Error())
 		}

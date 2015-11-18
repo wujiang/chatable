@@ -9,22 +9,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/datastore"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/datastore"
 )
 
 type threadTestData struct {
-	Status      string               `json:"status"`
-	Error       asapp.JSONError      `json:"error"`
-	Data        []asapp.PublicThread `json:"data"`
-	CurrentPage int                  `json:"current_page"`
-	PerPage     int                  `json:"per_page"`
+	Status      string                  `json:"status"`
+	Error       chatable.JSONError      `json:"error"`
+	Data        []chatable.PublicThread `json:"data"`
+	CurrentPage int                     `json:"current_page"`
+	PerPage     int                     `json:"per_page"`
 }
 
 type ThreadTokenTestSuite struct {
 	suite.Suite
 	server *httptest.Server
-	user   *asapp.User
+	user   *chatable.User
 }
 
 func (s *ThreadTokenTestSuite) SetupTest() {

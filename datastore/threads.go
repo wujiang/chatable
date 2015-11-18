@@ -1,11 +1,11 @@
 package datastore
 
-import "gitlab.com/wujiang/asapp"
+import "github.com/wujiang/chatable"
 
 type threadStore struct{ *DataStore }
 
 func init() {
-	tm := dbm.AddTableWithName(asapp.Thread{}, "threads")
+	tm := dbm.AddTableWithName(chatable.Thread{}, "threads")
 	tm.SetKeys(true, "id")
 	tm.ColMap("UserID").SetNotNull(true)
 	tm.ColMap("WithUserID").SetNotNull(true)
@@ -15,8 +15,8 @@ func init() {
 // Implement the ThreadService
 
 // GetByUserID returns a list of thread for user_id
-func (ts *threadStore) GetByUserID(uid int, offset int) ([]*asapp.Thread, error) {
-	var t asapp.Thread
+func (ts *threadStore) GetByUserID(uid int, offset int) ([]*chatable.Thread, error) {
+	var t chatable.Thread
 	query := `
                 select *
                 from threads
@@ -24,20 +24,20 @@ func (ts *threadStore) GetByUserID(uid int, offset int) ([]*asapp.Thread, error)
                 order by created_at desc
                 limit $2 offset $3
                 `
-	threads := []*asapp.Thread{}
-	ts_, err := ts.dbh.Select(&t, query, uid, asapp.PerPage, offset)
+	threads := []*chatable.Thread{}
+	ts_, err := ts.dbh.Select(&t, query, uid, chatable.PerPage, offset)
 	if err != nil {
 		return threads, err
 	}
 	for _, t_ := range ts_ {
-		threads = append(threads, t_.(*asapp.Thread))
+		threads = append(threads, t_.(*chatable.Thread))
 	}
 	return threads, err
 }
 
 // Upsert upserts a row in threads based on (user_id, with_user_id).
 // updates doesn't return the rows affected.
-func (ts *threadStore) Upsert(t *asapp.Thread) (int64, error) {
+func (ts *threadStore) Upsert(t *chatable.Thread) (int64, error) {
 	query := `
                 with upsert as (
                         update threads

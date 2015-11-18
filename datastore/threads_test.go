@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/wujiang/asapp"
 )
 
 type ThreadsTestSuite struct {
@@ -23,25 +22,25 @@ func (t *ThreadsTestSuite) TearDownTest() {
 }
 
 func (t *ThreadsTestSuite) TestUpsert() {
-	thread1, thread2 := asapp.NewThread(1, 2, "recipient", "hello")
+	thread1, thread2 := chatable.NewThread(1, 2, "recipient", "hello")
 	ct, err := testStore.ThreadStore.Upsert(thread1)
 	t.Equal(int64(1), ct)
 	t.Nil(err)
 	ct, err = testStore.ThreadStore.Upsert(thread2)
 	t.Nil(err)
 
-	var th asapp.Thread
+	var th chatable.Thread
 	err = testStore.dbh.SelectOne(&th, "select * from threads where id = 1")
 	t.Nil(err)
 	t.Equal(thread1.CreatedAt, th.CreatedAt)
 	t.Equal(thread1.LatestMessage, th.LatestMessage)
 
-	newThread1, _ := asapp.NewThread(1, 2, "recipient", "what's going on")
+	newThread1, _ := chatable.NewThread(1, 2, "recipient", "what's going on")
 	ct, err = testStore.ThreadStore.Upsert(newThread1)
 	t.Equal(int64(0), ct)
 	t.Nil(err)
 
-	var newTh asapp.Thread
+	var newTh chatable.Thread
 	err = testStore.dbh.SelectOne(&newTh, "select * from threads where id = 1")
 	t.Nil(err)
 	t.Equal(newThread1.CreatedAt, newTh.CreatedAt)
@@ -49,7 +48,7 @@ func (t *ThreadsTestSuite) TestUpsert() {
 }
 
 func (t *ThreadsTestSuite) TestGetByUserID() {
-	thread1, thread2 := asapp.NewThread(1, 2, "recipient", "hello")
+	thread1, thread2 := chatable.NewThread(1, 2, "recipient", "hello")
 	err := testStore.dbh.Insert(thread1)
 	t.Nil(err)
 	err = testStore.dbh.Insert(thread2)

@@ -3,7 +3,7 @@ package forms
 import (
 	"net/url"
 
-	"gitlab.com/wujiang/asapp"
+	"github.com/wujiang/chatable"
 )
 
 type FormValues map[string]interface{}
@@ -76,10 +76,10 @@ func (f *Form) Valid(postForm url.Values) bool {
 	return valid
 }
 
-func (f *Form) ConsolidateErrors() asapp.FormError {
-	errs := asapp.ErrorDetails{}
+func (f *Form) ConsolidateErrors() chatable.FormError {
+	errs := chatable.ErrorDetails{}
 	for name, err := range f.Errors {
 		errs[name] = err.Error()
 	}
-	return asapp.NewFormError("Invalid form", errs)
+	return chatable.NewFormError("Invalid form", errs)
 }

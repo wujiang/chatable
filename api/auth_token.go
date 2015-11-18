@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/auth"
-	"gitlab.com/wujiang/asapp/forms"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/auth"
+	"github.com/wujiang/chatable/forms"
 )
 
 var (
@@ -23,7 +23,7 @@ func init() {
 }
 
 // createNewAuthToken creates a new auth token
-func createNewAuthToken(w http.ResponseWriter, r *http.Request, u *asapp.User) (*asapp.PublicToken, asapp.CompoundError) {
+func createNewAuthToken(w http.ResponseWriter, r *http.Request, u *chatable.User) (*chatable.PublicToken, chatable.CompoundError) {
 	// create a new token for the user
 	// client_id is on the header
 	clientID := r.Header.Get("ClientID")
@@ -31,16 +31,16 @@ func createNewAuthToken(w http.ResponseWriter, r *http.Request, u *asapp.User) (
 	if err != nil {
 		cid = -1
 	}
-	at := asapp.NewAuthToken(u.ID, cid, asapp.StringSlice{"all"})
+	at := chatable.NewAuthToken(u.ID, cid, chatable.StringSlice{"all"})
 	if err = store.AuthTokenStore.Create(at); err != nil {
-		return nil, asapp.NewServerError(err.Error())
+		return nil, chatable.NewServerError(err.Error())
 	}
 	return at.ToPublicToken(), nil
 }
 
-func serveCreateAuthToken(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func serveCreateAuthToken(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	if err := r.ParseForm(); err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	valid := authTokenForm.Valid(r.PostForm)
 	if !valid {
@@ -50,7 +50,7 @@ func serveCreateAuthToken(w http.ResponseWriter, r *http.Request) asapp.Compound
 	if err != nil {
 		return auth.ErrUnauthenticated
 	}
-	if !asapp.CompareHash(u.Password, authTokenForm.Values["password"].(string)) {
+	if !chatable.CompareHash(u.Password, authTokenForm.Values["password"].(string)) {
 		return auth.ErrUnauthenticated
 	}
 
@@ -58,12 +58,12 @@ func serveCreateAuthToken(w http.ResponseWriter, r *http.Request) asapp.Compound
 	if cerr != nil {
 		return cerr
 	}
-	return writeJSON(w, asapp.NewJSONResult([]*asapp.PublicToken{token}, 1))
+	return writeJSON(w, chatable.NewJSONResult([]*chatable.PublicToken{token}, 1))
 }
 
-func serveDeactivateAuthToken(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func serveDeactivateAuthToken(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	if err := auth.TokenUnAuthenticate(w, r); err != nil {
 		return err
 	}
-	return writeJSON(w, asapp.NewJSONResult([]*asapp.PublicToken{}, 1))
+	return writeJSON(w, chatable.NewJSONResult([]*chatable.PublicToken{}, 1))
 }

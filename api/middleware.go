@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"gitlab.com/wujiang/asapp/auth"
+	"github.com/wujiang/chatable/auth"
 )
 
 func Authenticate(next http.Handler) http.Handler {

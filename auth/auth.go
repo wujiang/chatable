@@ -5,17 +5,17 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/datastore"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/datastore"
 )
 
 var (
 	store = datastore.NewDataStore(nil)
 
-	ErrUnauthenticated      = asapp.NewAuthenticationError("Unauthenticated")
-	ErrAlreadyAuthenticated = asapp.NewAuthenticationError("Already authenticated")
-	ErrUserNotFound         = asapp.NewAuthenticationError("User not found")
-	ErrUnauthorized         = asapp.NewAuthenticationError("Unauthorized")
+	ErrUnauthenticated      = chatable.NewAuthenticationError("Unauthenticated")
+	ErrAlreadyAuthenticated = chatable.NewAuthenticationError("Already authenticated")
+	ErrUserNotFound         = chatable.NewAuthenticationError("User not found")
+	ErrUnauthorized         = chatable.NewAuthenticationError("Unauthorized")
 )
 
 // protocol
@@ -61,7 +61,7 @@ var keyfunc = func(tk *jwt.Token) (interface{}, error) {
 }
 
 // TokenAuthenticate authenticates a token from request.
-func TokenAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func TokenAuthenticate(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	token, err := jwt.ParseFromRequest(r, keyfunc)
 	if err != nil || !token.Valid {
 		return ErrUnauthenticated
@@ -72,25 +72,25 @@ func TokenAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundErr
 }
 
 // TokenUnAuthenticate deactivates a token.
-func TokenUnAuthenticate(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func TokenUnAuthenticate(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	at := context.Get(r, "auth")
 	if at == nil {
 		return ErrUnauthenticated
 	}
-	authToken, ok := at.(*asapp.AuthToken)
+	authToken, ok := at.(*chatable.AuthToken)
 	if !ok {
 		return ErrUnauthenticated
 	}
 	authToken.IsActive = false
 	if _, err := store.AuthTokenStore.Update(authToken); err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	return nil
 }
 
 // ActiveUser gets the authenticated user from request.
-func ActiveUser(r *http.Request) *asapp.User {
-	user, ok := context.Get(r, "user").(*asapp.User)
+func ActiveUser(r *http.Request) *chatable.User {
+	user, ok := context.Get(r, "user").(*chatable.User)
 	if !ok {
 		return nil
 	}

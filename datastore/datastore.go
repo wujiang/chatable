@@ -3,15 +3,17 @@ package datastore
 import (
 	"database/sql"
 
+	"github.com/wujiang/chatable"
+
 	"github.com/coopernurse/gorp"
 	"github.com/golang/glog"
 	_ "github.com/lib/pq"
-	"gitlab.com/wujiang/asapp"
 )
 
 var dbm = &gorp.DbMap{
 	Dialect: gorp.PostgresDialect{},
 }
+
 var dbHandler gorp.SqlExecutor = dbm
 
 // Init opens a connection to the database
@@ -38,10 +40,10 @@ func Exit() {
 
 // Database is the portal to database
 type DataStore struct {
-	UserStore      asapp.UserService
-	ThreadStore    asapp.ThreadService
-	EnvelopeStore  asapp.EnvelopeService
-	AuthTokenStore asapp.AuthTokenService
+	UserStore      chatable.UserService
+	ThreadStore    chatable.ThreadService
+	EnvelopeStore  chatable.EnvelopeService
+	AuthTokenStore chatable.AuthTokenService
 
 	dbh gorp.SqlExecutor
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/wujiang/asapp"
 )
 
 type EnvelopesTestSuite struct {
@@ -23,13 +22,13 @@ func (s *EnvelopesTestSuite) TearDownTest() {
 }
 
 func (s *EnvelopesTestSuite) TestCreate() {
-	sEnv, rEnv := asapp.NewEnvelope(1, 2, "hello", asapp.MessageTypeText)
+	sEnv, rEnv := chatable.NewEnvelope(1, 2, "hello", chatable.MessageTypeText)
 	s.Nil(testStore.EnvelopeStore.Create(sEnv))
 	s.Nil(testStore.EnvelopeStore.Create(rEnv))
 }
 
 func (s *EnvelopesTestSuite) TestGetByUserIDWithUserID() {
-	sEnv, rEnv := asapp.NewEnvelope(1, 2, "hello", asapp.MessageTypeText)
+	sEnv, rEnv := chatable.NewEnvelope(1, 2, "hello", chatable.MessageTypeText)
 	s.Nil(testStore.EnvelopeStore.Create(sEnv))
 	s.Nil(testStore.EnvelopeStore.Create(rEnv))
 	envs, err := testStore.EnvelopeStore.GetByUserIDWithUserID(1, 2, 0)
@@ -46,10 +45,10 @@ func (s *EnvelopesTestSuite) TestGetByUserIDWithUserID() {
 }
 
 func (s *EnvelopesTestSuite) TestMarkDelete() {
-	sEnv, _ := asapp.NewEnvelope(1, 2, "hello", asapp.MessageTypeText)
+	sEnv, _ := chatable.NewEnvelope(1, 2, "hello", chatable.MessageTypeText)
 	s.Nil(testStore.EnvelopeStore.Create(sEnv))
 
-	env := asapp.Envelope{}
+	env := chatable.Envelope{}
 	err := testStore.dbh.SelectOne(&env, "select * from envelopes where id = 1")
 	s.False(env.DeletedAt.Valid)
 
@@ -62,10 +61,10 @@ func (s *EnvelopesTestSuite) TestMarkDelete() {
 }
 
 func (s *EnvelopesTestSuite) TestMarkRead() {
-	sEnv, _ := asapp.NewEnvelope(1, 2, "hello", asapp.MessageTypeText)
+	sEnv, _ := chatable.NewEnvelope(1, 2, "hello", chatable.MessageTypeText)
 	s.Nil(testStore.EnvelopeStore.Create(sEnv))
 
-	env := asapp.Envelope{}
+	env := chatable.Envelope{}
 	err := testStore.dbh.SelectOne(&env, "select * from envelopes where id = 1")
 	s.False(env.ReadAt.Valid)
 

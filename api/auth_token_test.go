@@ -9,24 +9,24 @@ import (
 	"strings"
 	"testing"
 
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/datastore"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/datastore"
 
 	"github.com/stretchr/testify/suite"
 )
 
 type authTestData struct {
-	Status      string              `json:"status"`
-	Error       asapp.JSONError     `json:"error"`
-	Data        []asapp.PublicToken `json:"data"`
-	CurrentPage int                 `json:"current_page"`
-	PerPage     int                 `json:"per_page"`
+	Status      string                 `json:"status"`
+	Error       chatable.JSONError     `json:"error"`
+	Data        []chatable.PublicToken `json:"data"`
+	CurrentPage int                    `json:"current_page"`
+	PerPage     int                    `json:"per_page"`
 }
 
 type AuthTokenTestSuite struct {
 	suite.Suite
 	server *httptest.Server
-	user   *asapp.User
+	user   *chatable.User
 }
 
 func (s *AuthTokenTestSuite) SetupTest() {
@@ -59,10 +59,10 @@ func (s *AuthTokenTestSuite) TestCreateAuthToken() {
 	s.Nil(err)
 
 	s.Equal("success", data.Status)
-	s.Equal(asapp.JSONError{
+	s.Equal(chatable.JSONError{
 		Code:    http.StatusOK,
 		Message: "",
-		Errors:  asapp.ErrorDetails(nil),
+		Errors:  chatable.ErrorDetails(nil),
 	}, data.Error)
 	s.Equal(1, len(data.Data))
 }
@@ -83,10 +83,10 @@ func (s *AuthTokenTestSuite) TestCreateAuthTokenInvalid() {
 	s.Nil(err)
 
 	s.Equal("fail", data.Status)
-	s.Equal(asapp.JSONError{
+	s.Equal(chatable.JSONError{
 		Code:    http.StatusUnauthorized,
 		Message: "Authentication errors",
-		Errors: asapp.ErrorDetails{
+		Errors: chatable.ErrorDetails{
 			"error": "Unauthenticated",
 		},
 	}, data.Error)

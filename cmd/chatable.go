@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"github.com/golang/glog"
-	"gitlab.com/wujiang/asapp/api"
-	"gitlab.com/wujiang/asapp/datastore"
-	"gitlab.com/wujiang/asapp/rds"
+	"github.com/wujiang/chatable/api"
+	"github.com/wujiang/chatable/datastore"
+	"github.com/wujiang/chatable/rds"
 )
 
 var (
@@ -33,10 +33,10 @@ func main() {
 	// command usage
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, `
-asapp
+chatable.go:36:chatable
 
 Usage:
-        asapp [options] command [arg...]
+chatable.go:39:        chatable [options] command [arg...]
 
 Commands
 `)
@@ -44,7 +44,7 @@ Commands
 			fmt.Fprintf(os.Stderr, "\t%s - %s\n", cmd.name, cmd.desc)
 		}
 		fmt.Fprintf(os.Stderr, `
-Use "asapp command -h" for command help.
+chatable.go:47:Use "chatable command -h" for command help.
 
 Options:
 `)
@@ -96,7 +96,7 @@ func serveCMD(args []string) {
 	sv := flag.NewFlagSet("serve", flag.ExitOnError)
 	sv.Usage = func() {
 		fmt.Fprintf(os.Stderr, `
-usage: asapp serve [options]
+chatable.go:99:usage: chatable serve [options]
 
 Start web server and api.
 

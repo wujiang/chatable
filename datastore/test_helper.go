@@ -1,10 +1,10 @@
 package datastore
 
-import "gitlab.com/wujiang/asapp"
+import "github.com/wujiang/chatable"
 
 const (
 	// TODO: add readme to setup test db
-	testDB             = "postgres://asapp@localhost:5432/asapp_test?sslmode=disable"
+	testDB             = "postgres://chatable@localhost:5432/chatable_test?sslmode=disable"
 	testSenderFirst    = "Sender"
 	testSenderLast     = "Send"
 	testSenderUname    = "sender"
@@ -22,10 +22,10 @@ const (
 var (
 	testStore = NewDataStore(nil)
 
-	testSender = asapp.NewUser(testSenderFirst, testSenderLast,
+	testSender = chatable.NewUser(testSenderFirst, testSenderLast,
 		testSenderUname, testPassword, testSenderEmail,
 		testSenderPhone, testIPAddr)
-	testRecipient = asapp.NewUser(testRecipientFirst, testRecipientLast,
+	testRecipient = chatable.NewUser(testRecipientFirst, testRecipientLast,
 		testRecipientUname, testPassword, testRecipientEmail,
 		testRecipientPhone, testIPAddr)
 )

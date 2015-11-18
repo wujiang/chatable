@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/forms"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/forms"
 )
 
 var usersForm = forms.New()
@@ -37,15 +37,15 @@ func init() {
 		WithValidators(forms.PhoneNumberValidator()))
 }
 
-func serveCreateUser(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func serveCreateUser(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	if err := r.ParseForm(); err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	valid := usersForm.Valid(r.PostForm)
 	if !valid {
 		return usersForm.ConsolidateErrors()
 	}
-	u := asapp.NewUser(usersForm.Values["first_name"].(string),
+	u := chatable.NewUser(usersForm.Values["first_name"].(string),
 		usersForm.Values["last_name"].(string),
 		usersForm.Values["username"].(string),
 		usersForm.Values["password"].(string),
@@ -57,17 +57,17 @@ func serveCreateUser(w http.ResponseWriter, r *http.Request) asapp.CompoundError
 	if err != nil {
 		msg := err.Error()
 		if strings.Contains(msg, "violates") {
-			return asapp.NewUserError("Some fileds are not unique")
+			return chatable.NewUserError("Some fileds are not unique")
 		}
-		return asapp.NewServerError(msg)
+		return chatable.NewServerError(msg)
 	}
 	// create a auth token
 	token, err := createNewAuthToken(w, r, u)
 	if err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
-	data := []asapp.UserWithToken{
-		asapp.UserWithToken{
+	data := []chatable.UserWithToken{
+		chatable.UserWithToken{
 			FirstName:   u.FirstName,
 			LastName:    u.LastName,
 			Username:    u.Username,
@@ -76,5 +76,5 @@ func serveCreateUser(w http.ResponseWriter, r *http.Request) asapp.CompoundError
 			Token:       *token,
 		},
 	}
-	return writeJSON(w, asapp.NewJSONResult(data, 1))
+	return writeJSON(w, chatable.NewJSONResult(data, 1))
 }

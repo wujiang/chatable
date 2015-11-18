@@ -10,22 +10,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/datastore"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/datastore"
 )
 
 type UsersTestSuite struct {
 	suite.Suite
 	server *httptest.Server
-	user   *asapp.User
+	user   *chatable.User
 }
 
 type usersTestData struct {
-	Status      string                `json:"status"`
-	Error       asapp.JSONError       `json:"error"`
-	Data        []asapp.UserWithToken `json:"data"`
-	CurrentPage int                   `json:"current_page"`
-	PerPage     int                   `json:"per_page"`
+	Status      string                   `json:"status"`
+	Error       chatable.JSONError       `json:"error"`
+	Data        []chatable.UserWithToken `json:"data"`
+	CurrentPage int                      `json:"current_page"`
+	PerPage     int                      `json:"per_page"`
 }
 
 func (s *UsersTestSuite) SetupTest() {
@@ -58,10 +58,10 @@ func (s *UsersTestSuite) TestCreateUsersMissing() {
 
 	s.Equal(usersTestData{
 		Status: "fail",
-		Error: asapp.JSONError{
+		Error: chatable.JSONError{
 			Code:    http.StatusBadRequest,
 			Message: "Form errors",
-			Errors: asapp.ErrorDetails{
+			Errors: chatable.ErrorDetails{
 				"username": "is required",
 				"email":    "is required",
 				"password": "is required",
@@ -69,8 +69,8 @@ func (s *UsersTestSuite) TestCreateUsersMissing() {
 			},
 		},
 		CurrentPage: 0,
-		PerPage:     asapp.PerPage,
-		Data:        []asapp.UserWithToken{},
+		PerPage:     chatable.PerPage,
+		Data:        []chatable.UserWithToken{},
 	}, data)
 
 }
@@ -97,17 +97,17 @@ func (s *UsersTestSuite) TestCreateUsersFormat() {
 
 	s.Equal(usersTestData{
 		Status: "fail",
-		Error: asapp.JSONError{
+		Error: chatable.JSONError{
 			Code:    http.StatusBadRequest,
 			Message: "Form errors",
-			Errors: asapp.ErrorDetails{
+			Errors: chatable.ErrorDetails{
 				"email":    "please enter a valid email address",
 				"password": "please enter a password with at least 10 characters",
 			},
 		},
 		CurrentPage: 0,
-		PerPage:     asapp.PerPage,
-		Data:        []asapp.UserWithToken{},
+		PerPage:     chatable.PerPage,
+		Data:        []chatable.UserWithToken{},
 	}, data)
 }
 
@@ -132,7 +132,7 @@ func (s *UsersTestSuite) TestCreateUsers() {
 	s.Nil(err)
 
 	s.Equal("success", data.Status)
-	s.Equal(asapp.JSONError{
+	s.Equal(chatable.JSONError{
 		Code:    http.StatusOK,
 		Message: "",
 		Errors:  nil,

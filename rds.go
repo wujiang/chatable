@@ -1,4 +1,4 @@
-package asapp
+package chatable
 
 // RdsService defines the protocol to use redis
 type RdsService interface {

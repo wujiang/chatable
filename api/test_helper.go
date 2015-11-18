@@ -9,11 +9,11 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"gitlab.com/wujiang/asapp"
+	"github.com/wujiang/chatable"
 )
 
 const (
-	testDB = "postgres://asapp@localhost:5432/asapp_test?sslmode=disable"
+	testDB = "postgres://chatable@localhost:5432/chatable_test?sslmode=disable"
 
 	testUserPass        = "password"
 	testUserFirst       = "first"
@@ -24,8 +24,8 @@ const (
 	testUserIP          = "0.0.0.0"
 )
 
-func helperCreateUser() *asapp.User {
-	u := asapp.NewUser(testUserFirst, testUserLast, testUsername,
+func helperCreateUser() *chatable.User {
+	u := chatable.NewUser(testUserFirst, testUserLast, testUsername,
 		testUserPass, testUserEmail, testUserPhoneNumber,
 		testUserIP)
 	if err := store.UserStore.Create(u); err != nil {
@@ -35,7 +35,7 @@ func helperCreateUser() *asapp.User {
 	}
 }
 
-func helperAuthToken(host string) (asapp.PublicToken, error) {
+func helperAuthToken(host string) (chatable.PublicToken, error) {
 	endpoint := strings.Join([]string{host, "/auth_token"}, "")
 	payload := url.Values{
 		"username": []string{testUsername},
@@ -43,18 +43,18 @@ func helperAuthToken(host string) (asapp.PublicToken, error) {
 	}
 	resp, err := http.PostForm(endpoint, payload)
 	if err != nil {
-		return asapp.PublicToken{}, err
+		return chatable.PublicToken{}, err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	data := struct {
-		Data        []asapp.PublicToken `json:"data"`
-		Total       int                 `json:"total"`
-		CurrentPage int                 `json:"current_page"`
-		PerPage     int                 `json:"per_page"`
+		Data        []chatable.PublicToken `json:"data"`
+		Total       int                    `json:"total"`
+		CurrentPage int                    `json:"current_page"`
+		PerPage     int                    `json:"per_page"`
 	}{}
 	if err = json.Unmarshal(body, &data); err != nil {
-		return asapp.PublicToken{}, err
+		return chatable.PublicToken{}, err
 	}
 	return data.Data[0], nil
 }

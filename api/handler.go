@@ -6,10 +6,10 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/datastore"
-	"gitlab.com/wujiang/asapp/rds"
-	"gitlab.com/wujiang/asapp/router"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/datastore"
+	"github.com/wujiang/chatable/rds"
+	"github.com/wujiang/chatable/router"
 
 	goerrors "github.com/go-errors/errors"
 )
@@ -34,7 +34,7 @@ func Handler() *mux.Router {
 	return m
 }
 
-type handler func(http.ResponseWriter, *http.Request) asapp.CompoundError
+type handler func(http.ResponseWriter, *http.Request) chatable.CompoundError
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h(w, r)
@@ -44,35 +44,35 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// add stacktrace for errors
 	goerr := goerrors.New(err.Error())
 	switch err.(type) {
-	case asapp.UserError:
+	case chatable.UserError:
 		w.WriteHeader(http.StatusBadRequest)
-		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
+		writeJSON(w, chatable.NewErrorJSONResult(chatable.JSONError{
 			Code:    http.StatusBadRequest,
 			Message: "User error",
-			Errors:  asapp.ErrorDetails{"error": err.Error()},
+			Errors:  chatable.ErrorDetails{"error": err.Error()},
 		}))
 		glog.Warning(goerr.ErrorStack())
-	case asapp.FormError:
+	case chatable.FormError:
 		w.WriteHeader(http.StatusBadRequest)
-		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
+		writeJSON(w, chatable.NewErrorJSONResult(chatable.JSONError{
 			Code:    http.StatusBadRequest,
 			Message: "Form error",
 			Errors:  err.Details(),
 		}))
 		glog.Warning(goerr.ErrorStack())
-	case asapp.AuthenticationError:
+	case chatable.AuthenticationError:
 		w.WriteHeader(http.StatusUnauthorized)
-		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
+		writeJSON(w, chatable.NewErrorJSONResult(chatable.JSONError{
 			Code:    http.StatusUnauthorized,
 			Message: "Authentication error",
-			Errors:  asapp.ErrorDetails{"error": err.Error()},
+			Errors:  chatable.ErrorDetails{"error": err.Error()},
 		}))
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
-		writeJSON(w, asapp.NewErrorJSONResult(asapp.JSONError{
+		writeJSON(w, chatable.NewErrorJSONResult(chatable.JSONError{
 			Code:    http.StatusInternalServerError,
 			Message: "Internal server error",
-			Errors: asapp.ErrorDetails{
+			Errors: chatable.ErrorDetails{
 				"error": "internal server error",
 			},
 		}))

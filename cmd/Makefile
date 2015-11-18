@@ -2,12 +2,12 @@
 
 default: build
 
-build: asapp
-	GOOS=linux GOARCH=amd64 go build -o asapp
+build: chatable
+	GOOS=linux GOARCH=amd64 go build -o chatable
 
 doc:
 	godoc -http=:8765
 
 local:
-	go build -o asapp
-	./asapp -c=development.json serve
+	go build -o chatable
+	./chatable -c=development.json serve

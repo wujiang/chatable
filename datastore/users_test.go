@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/wujiang/asapp"
 )
 
 type UsersTestSuite struct {
@@ -52,7 +51,7 @@ func (s *UsersTestSuite) TestGetByUsername() {
 }
 
 func (s *UsersTestSuite) TestCreate() {
-	user := asapp.NewUser("test", "last", "username", "password123",
+	user := chatable.NewUser("test", "last", "username", "password123",
 		"test@last.com", "1357902468", "0.0.0.0")
 	s.Nil(testStore.UserStore.Create(user))
 	u, err := testStore.UserStore.GetByUsername("username")

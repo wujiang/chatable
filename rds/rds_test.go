@@ -6,7 +6,7 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/wujiang/asapp"
+	"github.com/wujiang/chatable"
 )
 
 const (
@@ -38,11 +38,11 @@ func (rts *RdsTestSuite) TestEnqueue() {
 	conn := testRdsPool.pool.Get()
 	defer conn.Close()
 
-	env := asapp.PublicEnvelope{
+	env := chatable.PublicEnvelope{
 		Author:      "author",
 		Recipient:   "recipient",
 		Message:     "hello world",
-		MessageType: asapp.MessageTypeText,
+		MessageType: chatable.MessageTypeText,
 		CreatedAt:   time.Now().UTC(),
 	}
 	testRdsPool.Enqueue(testQueue, env)
@@ -52,11 +52,11 @@ func (rts *RdsTestSuite) TestEnqueue() {
 }
 
 func (rts *RdsTestSuite) TestDequeue() {
-	env := asapp.PublicEnvelope{
+	env := chatable.PublicEnvelope{
 		Author:      "author",
 		Recipient:   "recipient",
 		Message:     "hello world",
-		MessageType: asapp.MessageTypeText,
+		MessageType: chatable.MessageTypeText,
 		CreatedAt:   time.Now().UTC(),
 	}
 	testRdsPool.Enqueue(testQueue, env)

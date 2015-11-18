@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/auth"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/auth"
 )
 
-func serveGetThreads(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func serveGetThreads(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	params := r.URL.Query()
 	pg := params.Get("page")
 	page, err := strconv.Atoi(pg)
@@ -25,11 +25,11 @@ func serveGetThreads(w http.ResponseWriter, r *http.Request) asapp.CompoundError
 
 	threads, err := store.ThreadStore.GetByUserID(activeUser.ID, offset)
 	if err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
-	var pubThreads []*asapp.PublicThread
+	var pubThreads []*chatable.PublicThread
 	for _, th := range threads {
 		pubThreads = append(pubThreads, th.ToPublic())
 	}
-	return writeJSON(w, asapp.NewJSONResult(pubThreads, page))
+	return writeJSON(w, chatable.NewJSONResult(pubThreads, page))
 }

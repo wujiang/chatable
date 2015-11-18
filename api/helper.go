@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gitlab.com/wujiang/asapp"
+	"github.com/wujiang/chatable"
 )
 
-func writeJSON(w http.ResponseWriter, v interface{}) asapp.CompoundError {
+func writeJSON(w http.ResponseWriter, v interface{}) chatable.CompoundError {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	err := json.NewEncoder(w).Encode(v)
 	if err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	} else {
 		return nil
 	}

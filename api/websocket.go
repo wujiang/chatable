@@ -9,8 +9,8 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
-	"gitlab.com/wujiang/asapp"
-	"gitlab.com/wujiang/asapp/auth"
+	"github.com/wujiang/chatable"
+	"github.com/wujiang/chatable/auth"
 )
 
 const (
@@ -27,7 +27,7 @@ var (
 
 	Hub = hub{
 		connections: make(map[string][]*connection),
-		outgoing:    make(chan asapp.PublicEnvelope),
+		outgoing:    make(chan chatable.PublicEnvelope),
 		register:    make(chan *connection),
 		unregister:  make(chan *connection),
 	}
@@ -38,12 +38,12 @@ type connection struct {
 	conn   *websocket.Conn
 	uname  string
 	uid    int
-	outbuf chan asapp.PublicEnvelope
+	outbuf chan chatable.PublicEnvelope
 }
 
 func (c *connection) read() {
 	for {
-		var env asapp.PublicEnvelope
+		var env chatable.PublicEnvelope
 		// this blocks until new data comes in
 		err := c.conn.ReadJSON(&env)
 		if err == io.EOF {
@@ -53,11 +53,11 @@ func (c *connection) read() {
 			glog.Warning(err.Error())
 			continue
 		}
-		Hub.outgoing <- asapp.PublicEnvelope{
+		Hub.outgoing <- chatable.PublicEnvelope{
 			Author:      env.Author,
 			Recipient:   env.Recipient,
 			Message:     env.Message,
-			MessageType: asapp.MessageTypeText,
+			MessageType: chatable.MessageTypeText,
 			CreatedAt:   time.Now().UTC(),
 		}
 	}
@@ -94,7 +94,7 @@ func (c *connection) write() {
 
 type hub struct {
 	connections map[string][]*connection
-	outgoing    chan asapp.PublicEnvelope
+	outgoing    chan chatable.PublicEnvelope
 	register    chan *connection
 	unregister  chan *connection
 }
@@ -129,10 +129,10 @@ func (h *hub) Run(queue string) {
 	}
 }
 
-func serveWSConnect(w http.ResponseWriter, r *http.Request) asapp.CompoundError {
+func serveWSConnect(w http.ResponseWriter, r *http.Request) chatable.CompoundError {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return asapp.NewServerError(err.Error())
+		return chatable.NewServerError(err.Error())
 	}
 	activeUser := auth.ActiveUser(r)
 	// this should never happen
@@ -143,7 +143,7 @@ func serveWSConnect(w http.ResponseWriter, r *http.Request) asapp.CompoundError 
 		conn:   ws,
 		uname:  activeUser.Username,
 		uid:    activeUser.ID,
-		outbuf: make(chan asapp.PublicEnvelope),
+		outbuf: make(chan chatable.PublicEnvelope),
 	}
 
 	Hub.register <- c
