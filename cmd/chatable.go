@@ -33,10 +33,10 @@ func main() {
 	// command usage
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, `
-chatable.go:36:chatable
+chatable
 
 Usage:
-chatable.go:39:        chatable [options] command [arg...]
+        chatable [options] command [arg...]
 
 Commands
 `)
@@ -44,7 +44,7 @@ Commands
 			fmt.Fprintf(os.Stderr, "\t%s - %s\n", cmd.name, cmd.desc)
 		}
 		fmt.Fprintf(os.Stderr, `
-chatable.go:47:Use "chatable command -h" for command help.
+Use "chatable command -h" for command help.
 
 Options:
 `)
@@ -96,7 +96,7 @@ func serveCMD(args []string) {
 	sv := flag.NewFlagSet("serve", flag.ExitOnError)
 	sv.Usage = func() {
 		fmt.Fprintf(os.Stderr, `
-chatable.go:99:usage: chatable serve [options]
+usage: chatable serve [options]
 
 Start web server and api.
 

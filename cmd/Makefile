@@ -2,7 +2,7 @@
 
 default: build
 
-build: chatable
+build:
 	GOOS=linux GOARCH=amd64 go build -o chatable
 
 doc:
